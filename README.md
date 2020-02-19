@@ -7,8 +7,8 @@ You may find it useful as a starting point for your own project.
 
 ## Prerequisites
 
-* Java 8 or 11
-* Maven
+* Java 11
+* Maven 3.1+
 * Linux x64 or macOS
 
 
@@ -48,7 +48,7 @@ The packets are a bit artificial and include a mixture of HK and accessory data.
 
 ## Telecommanding
 
-(not yet included in this example)
+This project defines a few example CCSDS telecommands. They are sent to UDP port 10025. The simulator.py script listens to this port. Commands  have no side effects. The script will only count them.
 
 
 ## Bundling
