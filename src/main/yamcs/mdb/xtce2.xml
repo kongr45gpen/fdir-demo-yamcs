@@ -14,6 +14,15 @@
 				<UnitSet />
 				<FloatDataEncoding sizeInBits="32" />
 			</FloatParameterType>
+			<IntegerParameterType name="Event_Definition_ID_Type" signed="false">
+				<UnitSet />
+				<IntegerDataEncoding sizeInBits="16" />
+				<DefaultAlarm>
+					<StaticAlarmRanges>
+						<WatchRange minInclusive="1" maxInclusive="65534" />
+					</StaticAlarmRanges>
+				</DefaultAlarm>
+			</IntegerParameterType>
 		</ParameterTypeSet>
 		<ParameterSet>
 			<Parameter name="ECSS_Version" parameterTypeRef="uint8_t" />
@@ -23,6 +32,7 @@
 			<Parameter name="ECSS_03_Housekeeping_Structure_ID" parameterTypeRef="uint8_t" />
 			<Parameter name="Temperature_1" parameterTypeRef="float_t" />
 			<Parameter name="Temperature_2" parameterTypeRef="float_t" />
+			<Parameter name="Event_Definition_ID" parameterTypeRef="Event_Definition_ID_Type" />
 		</ParameterSet>
 		<ContainerSet>
 			<SequenceContainer abstract="true" name="ECSSTM">
@@ -55,6 +65,20 @@
 					<RestrictionCriteria>
 						<ComparisonList>
 							<Comparison value="1" parameterRef="ECSS_03_Housekeeping_Structure_ID" />
+						</ComparisonList>
+					</RestrictionCriteria>
+				</BaseContainer>
+			</SequenceContainer>
+			<SequenceContainer name="EventReporting">
+				<EntryList>
+					<ParameterRefEntry parameterRef="Event_Definition_ID" />
+				</EntryList>
+				<BaseContainer containerRef="ECSSTM">
+					<RestrictionCriteria>
+						<ComparisonList>
+							<Comparison value="5" parameterRef="ECSS_Service_Type" />
+							<Comparison comparisonOperator="&gt;=" value="1" parameterRef="ECSS_Message_Type" />
+							<Comparison comparisonOperator="&lt;=" value="4" parameterRef="ECSS_Message_Type" />
 						</ComparisonList>
 					</RestrictionCriteria>
 				</BaseContainer>
