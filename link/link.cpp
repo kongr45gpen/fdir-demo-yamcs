@@ -38,7 +38,7 @@ int main() {
                 std::string receivedRaw(reinterpret_cast<const char *>(buf.data().data()), zeroLocation);
                 buf.consume(zeroLocation + 1);
 
-                std::cout << "Received packet [" << receivedRaw.size() << "]" << std::endl;
+                // std::cout << "Received packet [" << receivedRaw.size() << "]" << std::endl;
 
                 // COBS decoding
                 std::vector<char> buffer(receivedRaw.size());
@@ -49,6 +49,10 @@ int main() {
                     std::cerr << "COBS status returned " << static_cast<int>(result.status) << std::endl;
                 } else {
                     // Send correct packet via UDP
+
+                    if (buffer[1] == -1 && buffer[2] == -1) {
+                        std::cout << std::string(buffer.data(), result.out_len).substr(4);
+                    }
 
                     socket.send_to(boost::asio::buffer(buffer.data(), result.out_len), endpoint);
                 }
