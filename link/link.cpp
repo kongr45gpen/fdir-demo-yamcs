@@ -52,9 +52,9 @@ int main() {
 
                     if (buffer[1] == -1 && buffer[2] == -1) {
                         std::cout << std::string(buffer.data(), result.out_len).substr(4);
+                    } else {
+                        socket.send_to(boost::asio::buffer(buffer.data(), result.out_len), endpoint);
                     }
-
-                    socket.send_to(boost::asio::buffer(buffer.data(), result.out_len), endpoint);
                 }
             } catch (boost::system::system_error &e) {
                 std::cerr << e.what() << std::endl;
