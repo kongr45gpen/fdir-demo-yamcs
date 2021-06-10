@@ -34,6 +34,19 @@
 			<Parameter name="Temperature_2" parameterTypeRef="float_t" />
 			<Parameter name="Event_Definition_ID" parameterTypeRef="Event_Definition_ID_Type" />
 		</ParameterSet>
+		<AlgorithmSet>
+			<CustomAlgorithm name="EventTranscriberAlgorithm">
+				<AncillaryDataSet>
+					<AncillaryData name="Yamcs:AlgorithmMandatoryInput">eventID</AncillaryData>
+				</AncillaryDataSet>
+				<AlgorithmText language="JavaScript">
+					Yamcs.watch("ECSS_Event_Parser", "ECSS_Event", "ECSS event " + eventID.value);
+				</AlgorithmText>
+				<InputSet>
+					<InputParameterInstanceRef parameterRef="Event_Definition_ID" inputName="eventID" />
+				</InputSet>
+			</CustomAlgorithm>
+		</AlgorithmSet>
 		<ContainerSet>
 			<SequenceContainer abstract="true" name="ECSSTM">
 				<EntryList>
