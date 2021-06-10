@@ -38,12 +38,24 @@
 			<CustomAlgorithm name="EventTranscriberAlgorithm">
 				<AncillaryDataSet>
 					<AncillaryData name="Yamcs:AlgorithmMandatoryInput">eventID</AncillaryData>
+					<AncillaryData name="Yamcs:AlgorithmMandatoryInput">messageType</AncillaryData>
 				</AncillaryDataSet>
 				<AlgorithmText language="JavaScript">
-					Yamcs.watch("ECSS_Event_Parser", "ECSS_Event", "ECSS event " + eventID.value);
+					if (eventID == null) return;
+
+					if (messageType.value == 1) {
+						Yamcs.watch("ECSS_Event_Parser", "ECSS_Informative_Event", "ECSS informative event " + eventID.value);
+					} else if (messageType.value == 2) {
+						Yamcs.warning("ECSS_Event_Parser", "ECSS_LowSev_Anomaly", "ECSS low severity anomaly " + eventID.value);
+					} else if (messageType.value == 3) {
+						Yamcs.distress("ECSS_Event_Parser", "ECSS_MedSev_Anomaly", "ECSS medium severity anomaly " + eventID.value);
+					} else if (messageType.value == 4) {
+						Yamcs.critical("ECSS_Event_Parser", "ECSS_HiSev_Anomaly", "ECSS high severity anomaly " + eventID.value);
+					}
 				</AlgorithmText>
 				<InputSet>
 					<InputParameterInstanceRef parameterRef="Event_Definition_ID" inputName="eventID" />
+					<InputParameterInstanceRef parameterRef="ECSS_Message_Type" inputName="messageType" />
 				</InputSet>
 			</CustomAlgorithm>
 		</AlgorithmSet>
