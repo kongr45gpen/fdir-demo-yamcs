@@ -95,6 +95,13 @@
 				<UnitSet />
 				<IntegerDataEncoding sizeInBits="16" />
 			</IntegerArgumentType>
+			<EnumeratedArgumentType name="AcubeSAT_ECSS_03_Definitions">
+				<UnitSet />
+				<IntegerDataEncoding sizeInBits="8" />
+				<EnumerationList>
+					<Enumeration value="1" label="Temperature Housekeeping" />
+				</EnumerationList>
+			</EnumeratedArgumentType>
 		</ArgumentTypeSet>
 		<MetaCommandSet>
 			<MetaCommand name="ECSSTC" abstract="true">
@@ -116,7 +123,7 @@
 			<MetaCommand name="AcubeSATTC" abstract="true">
 				<BaseMetaCommand metaCommandRef="ECSSTC">
 					<ArgumentAssignmentList>
-						<ArgumentAssignment argumentName="ECSS_Version" argumentValue="8" />
+						<ArgumentAssignment argumentName="ECSS_Version" argumentValue="32" />
 						<ArgumentAssignment argumentName="ECSS_Source_ID" argumentValue="0" />
 					</ArgumentAssignmentList>
 				</BaseMetaCommand>
@@ -138,6 +145,46 @@
 					<BaseContainer containerRef="AcubeSATTC" />
 				</CommandContainer>
 				<DefaultSignificance consequenceLevel="none" />
+			</MetaCommand>
+			<MetaCommand name="ECSS03Enable">
+				<LongDescription>Enable the generation of housekeeping reports</LongDescription>
+				<BaseMetaCommand metaCommandRef="AcubeSATTC">
+					<ArgumentAssignmentList>
+						<ArgumentAssignment argumentName="ECSS_Service_Type" argumentValue="3" />
+						<ArgumentAssignment argumentName="ECSS_Message_Type" argumentValue="5" />
+					</ArgumentAssignmentList>
+				</BaseMetaCommand>
+				<ArgumentList>
+					<Argument argumentTypeRef="AcubeSAT_ECSS_03_Definitions" name="Definition" shortDescription="Housekeeping Definition ID" />
+				</ArgumentList>
+				<CommandContainer name="ECSS03Enable">
+					<EntryList>
+						<FixedValueEntry name="N" binaryValue="01" sizeInBits="8"/>
+						<ArgumentRefEntry argumentRef="Definition" />
+					</EntryList>
+					<BaseContainer containerRef="AcubeSATTC" />
+				</CommandContainer>
+				<DefaultSignificance consequenceLevel="watch" />
+			</MetaCommand>
+			<MetaCommand name="ECSS03Disable">
+				<LongDescription>Disable the generation of housekeeping reports</LongDescription>
+				<BaseMetaCommand metaCommandRef="AcubeSATTC">
+					<ArgumentAssignmentList>
+						<ArgumentAssignment argumentName="ECSS_Service_Type" argumentValue="3" />
+						<ArgumentAssignment argumentName="ECSS_Message_Type" argumentValue="6" />
+					</ArgumentAssignmentList>
+				</BaseMetaCommand>
+				<ArgumentList>
+					<Argument argumentTypeRef="AcubeSAT_ECSS_03_Definitions" name="Definition" shortDescription="Housekeeping Definition ID" />
+				</ArgumentList>
+				<CommandContainer name="ECSS03Disable">
+					<EntryList>
+						<FixedValueEntry name="N" binaryValue="01" sizeInBits="8"/>
+						<ArgumentRefEntry argumentRef="Definition" />
+					</EntryList>
+					<BaseContainer containerRef="AcubeSATTC" />
+				</CommandContainer>
+				<DefaultSignificance consequenceLevel="watch" />
 			</MetaCommand>
 		</MetaCommandSet>
 	</CommandMetaData>
