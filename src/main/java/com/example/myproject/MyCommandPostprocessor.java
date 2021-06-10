@@ -13,7 +13,7 @@ import org.yamcs.utils.ByteArrayUtils;
  * A single instance of this class is created, scoped to the link udp-out.
  * <p>
  * This is specified in the configuration file yamcs.myproject.yaml:
- * 
+ *
  * <pre>
  * ...
  * dataLinks:
@@ -54,18 +54,18 @@ public class MyCommandPostprocessor implements CommandPostprocessor {
         byte[] binary = pc.getBinary();
 
         // Set CCSDS packet length
-        ByteArrayUtils.encodeShort(binary.length - 7, binary, 4);
+        // ByteArrayUtils.encodeShort(binary.length - 7, binary, 4);
 
         // Set CCSDS sequence count
-        int seqCount = seqFiller.fill(binary);
+        // int seqCount = seqFiller.fill(binary);
 
         // Publish the sequence count to Command History. This has no special
         // meaning to Yamcs, but it shows how to store custom information specific
         // to a command.
-        commandHistory.publish(pc.getCommandId(), "ccsds-seqcount", seqCount);
+        // commandHistory.publish(pc.getCommandId(), "ccsds-seqcount", seqCount);
 
         // Since we modified the binary, update the binary in Command History too.
-        commandHistory.publish(pc.getCommandId(), PreparedCommand.CNAME_BINARY, binary);
+        // commandHistory.publish(pc.getCommandId(), PreparedCommand.CNAME_BINARY, binary);
 
         return binary;
     }

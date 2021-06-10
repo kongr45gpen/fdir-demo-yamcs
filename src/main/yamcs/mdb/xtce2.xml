@@ -87,130 +87,57 @@
 	</TelemetryMetaData>
 	<CommandMetaData>
 		<ArgumentTypeSet>
-			<IntegerArgumentType name="CCSDS_Version_Type" signed="false">
+			<IntegerArgumentType name="uint8_t" signed="false">
 				<UnitSet />
-				<IntegerDataEncoding sizeInBits="3" />
+				<IntegerDataEncoding sizeInBits="8" />
 			</IntegerArgumentType>
-			<BooleanArgumentType name="CCSDS_Type_Type" zeroStringValue="TM" oneStringValue="TC">
-				<UnitSet />
-				<IntegerDataEncoding sizeInBits="1" />
-			</BooleanArgumentType>
-			<BooleanArgumentType name="CCSDS_Sec_Hdr_Flag_Type" zeroStringValue="NotPresent" oneStringValue="Present">
-				<UnitSet />
-				<IntegerDataEncoding sizeInBits="1" />
-			</BooleanArgumentType>
-			<IntegerArgumentType name="CCSDS_APID_Type" signed="false">
-				<UnitSet />
-				<IntegerDataEncoding sizeInBits="11" />
-			</IntegerArgumentType>
-			<EnumeratedArgumentType name="CCSDS_Group_Flags_Type">
-				<UnitSet />
-				<IntegerDataEncoding sizeInBits="2" />
-				<EnumerationList>
-					<Enumeration value="0" label="Continuation" />
-					<Enumeration value="1" label="First" />
-					<Enumeration value="2" label="Last" />
-					<Enumeration value="3" label="Standalone" />
-				</EnumerationList>
-			</EnumeratedArgumentType>
-			<IntegerArgumentType name="Packet_ID_Type" signed="false">
+			<IntegerArgumentType name="uint16_t" signed="false">
 				<UnitSet />
 				<IntegerDataEncoding sizeInBits="16" />
 			</IntegerArgumentType>
-			<IntegerArgumentType name="Battery_Type" signed="false">
-				<UnitSet />
-				<IntegerDataEncoding encoding="unsigned" sizeInBits="16" />
-				<ValidRangeSet>
-					<ValidRange minInclusive="1" maxInclusive="3" />
-				</ValidRangeSet>
-			</IntegerArgumentType>
 		</ArgumentTypeSet>
 		<MetaCommandSet>
-			<MetaCommand name="CCSDSPacket" abstract="true">
+			<MetaCommand name="ECSSTC" abstract="true">
 				<ArgumentList>
-					<Argument argumentTypeRef="CCSDS_Version_Type" name="CCSDS_Version" />
-					<Argument argumentTypeRef="CCSDS_Type_Type" name="CCSDS_Type" />
-					<Argument argumentTypeRef="CCSDS_Sec_Hdr_Flag_Type" name="CCSDS_Sec_Hdr_Flag" />
-					<Argument argumentTypeRef="CCSDS_APID_Type" name="CCSDS_APID" />
-					<Argument argumentTypeRef="CCSDS_Group_Flags_Type" name="CCSDS_Group_Flags" />
+					<Argument argumentTypeRef="uint8_t" name="ECSS_Version" />
+					<Argument argumentTypeRef="uint8_t" name="ECSS_Service_Type" />
+					<Argument argumentTypeRef="uint8_t" name="ECSS_Message_Type" />
+					<Argument argumentTypeRef="uint16_t" name="ECSS_Source_ID" />
 				</ArgumentList>
-				<CommandContainer name="CCSDSPacket">
+				<CommandContainer name="ECSSTCContainer">
 					<EntryList>
-						<ArgumentRefEntry argumentRef="CCSDS_Version" />
-						<ArgumentRefEntry argumentRef="CCSDS_Type" />
-						<ArgumentRefEntry argumentRef="CCSDS_Sec_Hdr_Flag" />
-						<ArgumentRefEntry argumentRef="CCSDS_APID" />
-						<ArgumentRefEntry argumentRef="CCSDS_Group_Flags" />
-						<!-- Final value is set by post-processor after the command is submitted. -->
-						<FixedValueEntry name="CCSDS_Source_Sequence_Count" binaryValue="0000" sizeInBits="14" />
-						<!-- Final value is set by post-processor after the command is submitted. -->
-						<FixedValueEntry name="CCSDS_Packet_Length" binaryValue="0000" sizeInBits="16" />
+						<ArgumentRefEntry argumentRef="ECSS_Version" />
+						<ArgumentRefEntry argumentRef="ECSS_Service_Type" />
+						<ArgumentRefEntry argumentRef="ECSS_Message_Type" />
+						<ArgumentRefEntry argumentRef="ECSS_Source_ID" />
 					</EntryList>
 				</CommandContainer>
 			</MetaCommand>
-			<MetaCommand name="MyProjectPacket" abstract="true">
-				<BaseMetaCommand metaCommandRef="CCSDSPacket">
+			<MetaCommand name="AcubeSATTC" abstract="true">
+				<BaseMetaCommand metaCommandRef="ECSSTC">
 					<ArgumentAssignmentList>
-						<ArgumentAssignment argumentName="CCSDS_Version" argumentValue="0" />
-						<ArgumentAssignment argumentName="CCSDS_Type" argumentValue="TC" />
-						<ArgumentAssignment argumentName="CCSDS_Sec_Hdr_Flag" argumentValue="NotPresent" />
-						<ArgumentAssignment argumentName="CCSDS_APID" argumentValue="101" />
-						<ArgumentAssignment argumentName="CCSDS_Group_Flags" argumentValue="Standalone" />
+						<ArgumentAssignment argumentName="ECSS_Version" argumentValue="8" />
+						<ArgumentAssignment argumentName="ECSS_Source_ID" argumentValue="0" />
 					</ArgumentAssignmentList>
 				</BaseMetaCommand>
-				<ArgumentList>
-					<Argument argumentTypeRef="Packet_ID_Type" name="Packet_ID" />
-				</ArgumentList>
-				<CommandContainer name="MyProjectPacket">
-					<EntryList>
-						<ArgumentRefEntry argumentRef="Packet_ID" />
-					</EntryList>
-					<BaseContainer containerRef="CCSDSPacket" />
-				</CommandContainer>
-			</MetaCommand>
-			<MetaCommand name="Reboot">
-				<BaseMetaCommand metaCommandRef="MyProjectPacket">
-					<ArgumentAssignmentList>
-						<ArgumentAssignment argumentName="Packet_ID" argumentValue="1" />
-					</ArgumentAssignmentList>
-				</BaseMetaCommand>
-				<CommandContainer name="Reboot">
+				<ArgumentList />
+				<CommandContainer name="AcubeSATTC">
 					<EntryList />
-					<BaseContainer containerRef="MyProjectPacket" />
-				</CommandContainer>
-				<DefaultSignificance consequenceLevel="vital" />
-			</MetaCommand>
-			<MetaCommand name="SwitchVoltageOn" shortDescription="Switches a battery on">
-				<BaseMetaCommand metaCommandRef="MyProjectPacket">
-					<ArgumentAssignmentList>
-						<ArgumentAssignment argumentName="Packet_ID" argumentValue="2" />
-					</ArgumentAssignmentList>
-				</BaseMetaCommand>
-				<ArgumentList>
-					<Argument argumentTypeRef="Battery_Type" name="Battery" shortDescription="Number of the battery" />
-				</ArgumentList>
-				<CommandContainer name="SwitchVoltageOn">
-					<EntryList>
-						<ArgumentRefEntry argumentRef="Battery" />
-					</EntryList>
-					<BaseContainer containerRef="MyProjectPacket" />
+					<BaseContainer containerRef="ECSSTCContainer" />
 				</CommandContainer>
 			</MetaCommand>
-			<MetaCommand name="SwitchVoltageOff" shortDescription="Switches a battery off">
-				<BaseMetaCommand metaCommandRef="MyProjectPacket">
+			<MetaCommand name="Test">
+				<BaseMetaCommand metaCommandRef="AcubeSATTC">
 					<ArgumentAssignmentList>
-						<ArgumentAssignment argumentName="Packet_ID" argumentValue="3" />
+						<ArgumentAssignment argumentName="ECSS_Service_Type" argumentValue="17" />
+						<ArgumentAssignment argumentName="ECSS_Message_Type" argumentValue="1" />
 					</ArgumentAssignmentList>
 				</BaseMetaCommand>
-				<ArgumentList>
-					<Argument argumentTypeRef="Battery_Type" name="Battery" shortDescription="Number of the battery" />
-				</ArgumentList>
-				<CommandContainer name="SwitchVoltageOff">
-					<EntryList>
-						<ArgumentRefEntry argumentRef="Battery" />
-					</EntryList>
-					<BaseContainer containerRef="MyProjectPacket" />
+				<CommandContainer name="TestContainer">
+					<EntryList />
+					<BaseContainer containerRef="AcubeSATTC" />
 				</CommandContainer>
+				<DefaultSignificance consequenceLevel="none" />
 			</MetaCommand>
 		</MetaCommandSet>
 	</CommandMetaData>
