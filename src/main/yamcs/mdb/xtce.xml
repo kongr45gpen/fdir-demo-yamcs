@@ -177,6 +177,12 @@
 				<UnitSet />
 				<IntegerDataEncoding sizeInBits="16" />
 			</IntegerArgumentType>
+			<IntegerArgumentType name="interval_ms_16" signed="false">
+				<UnitSet>
+					<Unit>milliseconds</Unit>
+				</UnitSet>
+				<IntegerDataEncoding sizeInBits="16" />
+			</IntegerArgumentType>
 			<EnumeratedArgumentType name="AcubeSAT_ECSS_03_Definitions">
 				<UnitSet />
 				<IntegerDataEncoding sizeInBits="8" />
@@ -255,7 +261,7 @@
 					</EntryList>
 					<BaseContainer containerRef="AcubeSATTC" />
 				</CommandContainer>
-				<DefaultSignificance consequenceLevel="watch" />
+				<DefaultSignificance consequenceLevel="warning" />
 			</MetaCommand>
 			<MetaCommand name="ECSS03Disable">
 				<LongDescription>Disable the generation of housekeeping reports</LongDescription>
@@ -272,6 +278,28 @@
 					<EntryList>
 						<FixedValueEntry name="N" binaryValue="01" sizeInBits="8"/>
 						<ArgumentRefEntry argumentRef="Definition" />
+					</EntryList>
+					<BaseContainer containerRef="AcubeSATTC" />
+				</CommandContainer>
+				<DefaultSignificance consequenceLevel="warning" />
+			</MetaCommand>
+			<MetaCommand name="ECSS03SetInterval">
+				<LongDescription>Set the generation interval of housekeeping reports</LongDescription>
+				<BaseMetaCommand metaCommandRef="AcubeSATTC">
+					<ArgumentAssignmentList>
+						<ArgumentAssignment argumentName="ECSS_Service_Type" argumentValue="3" />
+						<ArgumentAssignment argumentName="ECSS_Message_Type" argumentValue="31" />
+					</ArgumentAssignmentList>
+				</BaseMetaCommand>
+				<ArgumentList>
+					<Argument argumentTypeRef="AcubeSAT_ECSS_03_Definitions" name="Definition" shortDescription="Housekeeping Definition ID" />
+					<Argument argumentTypeRef="interval_ms_16" name="Collection_Interval" />
+				</ArgumentList>
+				<CommandContainer name="ECSS03SetInterval">
+					<EntryList>
+						<FixedValueEntry name="N" binaryValue="01" sizeInBits="8"/>
+						<ArgumentRefEntry argumentRef="Definition" />
+						<ArgumentRefEntry argumentRef="Collection_Interval" />
 					</EntryList>
 					<BaseContainer containerRef="AcubeSATTC" />
 				</CommandContainer>
