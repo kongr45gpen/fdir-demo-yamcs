@@ -373,6 +373,34 @@
 				</CommandContainer>
 				<DefaultSignificance consequenceLevel="warning" />
 			</MetaCommand>
+			<MetaCommand name="OnBoardMonitoring_Enable">
+				<LongDescription>Enable the entire on-board monitoring function</LongDescription>
+				<BaseMetaCommand metaCommandRef="AcubeSATTC">
+					<ArgumentAssignmentList>
+						<ArgumentAssignment argumentName="ECSS_Service_Type" argumentValue="12" />
+						<ArgumentAssignment argumentName="ECSS_Message_Type" argumentValue="15" />
+					</ArgumentAssignmentList>
+				</BaseMetaCommand>
+				<CommandContainer name="OnBoardMonitoring_Enable">
+					<EntryList />
+					<BaseContainer containerRef="AcubeSATTC" />
+				</CommandContainer>
+				<DefaultSignificance consequenceLevel="warning" />
+			</MetaCommand>
+			<MetaCommand name="OnBoardMonitoring_Disable">
+				<LongDescription>Disable the entire on-board monitoring function</LongDescription>
+				<BaseMetaCommand metaCommandRef="AcubeSATTC">
+					<ArgumentAssignmentList>
+						<ArgumentAssignment argumentName="ECSS_Service_Type" argumentValue="12" />
+						<ArgumentAssignment argumentName="ECSS_Message_Type" argumentValue="16" />
+					</ArgumentAssignmentList>
+				</BaseMetaCommand>
+				<CommandContainer name="OnBoardMonitoring_Disable">
+					<EntryList />
+					<BaseContainer containerRef="AcubeSATTC" />
+				</CommandContainer>
+				<DefaultSignificance consequenceLevel="warning" />
+			</MetaCommand>
 		</MetaCommandSet>
 	</CommandMetaData>
 </SpaceSystem>
