@@ -95,10 +95,9 @@ int main() {
                             std::cout << std::string(buffer.data(), result.out_len).substr(4);
                         } else {
                             txSocket.send_to(boost::asio::buffer(buffer.data(), result.out_len), endpoint);
+                            std::cout << "\u001b[38;5;243m" << "Received TM (" << receivedRaw.size() << ")" << "\u001b[0m" << std::endl;
                         }
                     }
-
-                    // std::cout << "Received packet [" << receivedRaw.size() << "]" << std::endl;
                 }
 
             // Read next data packet
