@@ -57,6 +57,9 @@
 					<InputParameterInstanceRef parameterRef="Event_Definition_ID" inputName="eventID" />
 					<InputParameterInstanceRef parameterRef="ECSS_Message_Type" inputName="messageType" />
 				</InputSet>
+				<TriggerSet>
+					<OnParameterUpdateTrigger parameterRef="Event_Definition_ID" />
+				</TriggerSet>
 			</CustomAlgorithm>
 		</AlgorithmSet>
 		<ContainerSet>
@@ -112,6 +115,10 @@
 	</TelemetryMetaData>
 	<CommandMetaData>
 		<ArgumentTypeSet>
+			<IntegerArgumentType name="uint4_t" signed="false">
+				<UnitSet />
+				<IntegerDataEncoding sizeInBits="4" />
+			</IntegerArgumentType>
 			<IntegerArgumentType name="uint8_t" signed="false">
 				<UnitSet />
 				<IntegerDataEncoding sizeInBits="8" />
@@ -131,7 +138,8 @@
 		<MetaCommandSet>
 			<MetaCommand name="ECSSTC" abstract="true">
 				<ArgumentList>
-					<Argument argumentTypeRef="uint8_t" name="ECSS_Version" />
+					<Argument argumentTypeRef="uint4_t" name="ECSS_Version" />
+					<Argument argumentTypeRef="uint4_t" name="ECSS_Acknowledgement_Flags" />
 					<Argument argumentTypeRef="uint8_t" name="ECSS_Service_Type" />
 					<Argument argumentTypeRef="uint8_t" name="ECSS_Message_Type" />
 					<Argument argumentTypeRef="uint16_t" name="ECSS_Source_ID" />
@@ -139,6 +147,7 @@
 				<CommandContainer name="ECSSTCContainer">
 					<EntryList>
 						<ArgumentRefEntry argumentRef="ECSS_Version" />
+						<ArgumentRefEntry argumentRef="ECSS_Acknowledgement_Flags" />
 						<ArgumentRefEntry argumentRef="ECSS_Service_Type" />
 						<ArgumentRefEntry argumentRef="ECSS_Message_Type" />
 						<ArgumentRefEntry argumentRef="ECSS_Source_ID" />
@@ -148,7 +157,8 @@
 			<MetaCommand name="AcubeSATTC" abstract="true">
 				<BaseMetaCommand metaCommandRef="ECSSTC">
 					<ArgumentAssignmentList>
-						<ArgumentAssignment argumentName="ECSS_Version" argumentValue="32" />
+						<ArgumentAssignment argumentName="ECSS_Version" argumentValue="2" />
+						<ArgumentAssignment argumentName="ECSS_Acknowledgement_Flags" argumentValue="0b1111" />
 						<ArgumentAssignment argumentName="ECSS_Source_ID" argumentValue="0" />
 					</ArgumentAssignmentList>
 				</BaseMetaCommand>
@@ -210,6 +220,20 @@
 					<BaseContainer containerRef="AcubeSATTC" />
 				</CommandContainer>
 				<DefaultSignificance consequenceLevel="watch" />
+			</MetaCommand>
+			<MetaCommand name="TestError">
+				<LongDescription>An erroneous command to test parsing errors</LongDescription>
+				<BaseMetaCommand metaCommandRef="AcubeSATTC">
+					<ArgumentAssignmentList>
+						<ArgumentAssignment argumentName="ECSS_Service_Type" argumentValue="95" />
+						<ArgumentAssignment argumentName="ECSS_Message_Type" argumentValue="60" />
+					</ArgumentAssignmentList>
+				</BaseMetaCommand>
+				<ArgumentList />
+				<CommandContainer name="TestError">
+					<BaseContainer containerRef="AcubeSATTC" />
+				</CommandContainer>
+				<DefaultSignificance consequenceLevel="none" />
 			</MetaCommand>
 		</MetaCommandSet>
 	</CommandMetaData>
