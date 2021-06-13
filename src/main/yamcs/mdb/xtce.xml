@@ -190,6 +190,26 @@
 					<Enumeration value="1" label="Temperature Housekeeping" />
 				</EnumerationList>
 			</EnumeratedArgumentType>
+			<StringArgumentType name="ECSS_Function_Name_Type">
+				<UnitSet />
+				<StringDataEncoding>
+					<SizeInBits>
+						<Fixed>
+							<FixedValue>256</FixedValue>
+						</Fixed>
+					</SizeInBits>
+				</StringDataEncoding>
+			</StringArgumentType>
+			<StringArgumentType name="ECSS_Function_Data_Type">
+				<UnitSet />
+				<StringDataEncoding>
+					<SizeInBits>
+						<Fixed>
+							<FixedValue>256</FixedValue>
+						</Fixed>
+					</SizeInBits>
+				</StringDataEncoding>
+			</StringArgumentType>
 		</ArgumentTypeSet>
 		<MetaCommandSet>
 			<MetaCommand name="ECSSTC" abstract="true">
@@ -318,6 +338,40 @@
 					<BaseContainer containerRef="AcubeSATTC" />
 				</CommandContainer>
 				<DefaultSignificance consequenceLevel="none" />
+			</MetaCommand>
+			<MetaCommand name="ST08_Function" abstract="true">
+				<LongDescription>Run an ST[08] on-board function</LongDescription>
+				<ArgumentList>
+					<Argument argumentTypeRef="ECSS_Function_Name_Type" name="ECSS_Function_Name" shortDescription="Function definition name" />
+					<Argument argumentTypeRef="ECSS_Function_Data_Type" name="ECSS_Function_Data" shortDescription="Auxiliary data to include" initialValue="\u000" />
+				</ArgumentList>
+				<BaseMetaCommand metaCommandRef="AcubeSATTC">
+					<ArgumentAssignmentList>
+						<ArgumentAssignment argumentName="ECSS_Service_Type" argumentValue="8" />
+						<ArgumentAssignment argumentName="ECSS_Message_Type" argumentValue="1" />
+					</ArgumentAssignmentList>
+				</BaseMetaCommand>
+				<CommandContainer name="ST08_Function">
+					<EntryList>
+						<ArgumentRefEntry argumentRef="ECSS_Function_Name" />
+						<ArgumentRefEntry argumentRef="ECSS_Function_Data" />
+					</EntryList>
+					<BaseContainer containerRef="AcubeSATTC" />
+				</CommandContainer>
+				<DefaultSignificance consequenceLevel="none" />
+			</MetaCommand>
+			<MetaCommand name="MCU_Reset">
+				<LongDescription>Perform a soft reset of the MCU</LongDescription>
+				<BaseMetaCommand metaCommandRef="ST08_Function">
+					<ArgumentAssignmentList>
+						<ArgumentAssignment argumentName="ECSS_Function_Name" argumentValue="restart" />
+					</ArgumentAssignmentList>
+				</BaseMetaCommand>
+				<CommandContainer name="MCU_Reset">
+					<EntryList />
+					<BaseContainer containerRef="ST08_Function" />
+				</CommandContainer>
+				<DefaultSignificance consequenceLevel="warning" />
 			</MetaCommand>
 		</MetaCommandSet>
 	</CommandMetaData>
