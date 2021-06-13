@@ -14,15 +14,36 @@
 				<UnitSet />
 				<FloatDataEncoding sizeInBits="32" />
 			</FloatParameterType>
+			<FloatParameterType name="Temperature_Type">
+				<UnitSet>
+					<Unit>celsius</Unit>
+				</UnitSet>
+				<FloatDataEncoding sizeInBits="32" />
+			</FloatParameterType>
 			<IntegerParameterType name="Event_Definition_ID_Type" signed="false">
 				<UnitSet />
 				<IntegerDataEncoding sizeInBits="16" />
-				<DefaultAlarm>
-					<StaticAlarmRanges>
-						<WatchRange minInclusive="1" maxInclusive="65534" />
-					</StaticAlarmRanges>
-				</DefaultAlarm>
 			</IntegerParameterType>
+			<IntegerParameterType name="Packet_Version_Type" signed="false">
+				<UnitSet />
+				<IntegerDataEncoding sizeInBits="3" />
+			</IntegerParameterType>
+			<IntegerParameterType name="APID_Type" signed="false">
+				<UnitSet />
+				<IntegerDataEncoding sizeInBits="11" />
+			</IntegerParameterType>
+			<IntegerParameterType name="Packet_Sequence_Count_Type" signed="false">
+				<UnitSet />
+				<IntegerDataEncoding sizeInBits="14" />
+			</IntegerParameterType>
+			<EnumeratedParameterType name="Packet_Type_Type">
+				<UnitSet />
+				<IntegerDataEncoding sizeInBits="1"/>
+				<EnumerationList>
+					<Enumeration label="TM" value="0" />
+					<Enumeration label="TC" value="1" />
+				</EnumerationList>
+			</EnumeratedParameterType>
 		</ParameterTypeSet>
 		<ParameterSet>
 			<Parameter name="ECSS_Version" parameterTypeRef="uint8_t" />
@@ -30,9 +51,14 @@
 			<Parameter name="ECSS_Message_Type" parameterTypeRef="uint8_t" />
 			<Parameter name="ECSS_MessageTypeCounter" parameterTypeRef="uint16_t" />
 			<Parameter name="ECSS_03_Housekeeping_Structure_ID" parameterTypeRef="uint8_t" />
-			<Parameter name="Temperature_1" parameterTypeRef="float_t" />
-			<Parameter name="Temperature_2" parameterTypeRef="float_t" />
+			<Parameter name="Temperature_1" parameterTypeRef="Temperature_Type" />
+			<Parameter name="Temperature_2" parameterTypeRef="Temperature_Type" />
 			<Parameter name="Event_Definition_ID" parameterTypeRef="Event_Definition_ID_Type" />
+			<Parameter name="Verification_ECSS_Version" parameterTypeRef="Packet_Version_Type" />
+			<Parameter name="Verification_Packet_Type" parameterTypeRef="Packet_Type_Type" />
+			<Parameter name="Verification_APID" parameterTypeRef="APID_Type" />
+			<Parameter name="Verification_Packet_Sequence_Count" parameterTypeRef="Packet_Sequence_Count_Type" />
+			<Parameter name="Verification_Code" parameterTypeRef="uint16_t" />
 		</ParameterSet>
 		<AlgorithmSet>
 			<CustomAlgorithm name="EventTranscriberAlgorithm">
@@ -107,6 +133,30 @@
 							<Comparison value="5" parameterRef="ECSS_Service_Type" />
 							<Comparison comparisonOperator="&gt;=" value="1" parameterRef="ECSS_Message_Type" />
 							<Comparison comparisonOperator="&lt;=" value="4" parameterRef="ECSS_Message_Type" />
+						</ComparisonList>
+					</RestrictionCriteria>
+				</BaseContainer>
+			</SequenceContainer>
+			<SequenceContainer name="VerificationReport">
+				<EntryList>
+					<ParameterRefEntry parameterRef="Verification_ECSS_Version" />
+					<ParameterRefEntry parameterRef="Verification_Packet_Type" />
+					<ParameterRefEntry parameterRef="Verification_APID">
+						<LocationInContainerInBits referenceLocation="previousEntry">
+							<FixedValue>1</FixedValue>
+						</LocationInContainerInBits>
+					</ParameterRefEntry>
+					<ParameterRefEntry parameterRef="Verification_Packet_Sequence_Count">
+						<LocationInContainerInBits referenceLocation="previousEntry">
+							<FixedValue>2</FixedValue>
+						</LocationInContainerInBits>
+					</ParameterRefEntry>
+					<ParameterRefEntry parameterRef="Verification_Code" />
+				</EntryList>
+				<BaseContainer containerRef="ECSSTM">
+					<RestrictionCriteria>
+						<ComparisonList>
+							<Comparison value="1" parameterRef="ECSS_Service_Type" />
 						</ComparisonList>
 					</RestrictionCriteria>
 				</BaseContainer>
@@ -229,8 +279,8 @@
 						<ArgumentAssignment argumentName="ECSS_Message_Type" argumentValue="60" />
 					</ArgumentAssignmentList>
 				</BaseMetaCommand>
-				<ArgumentList />
 				<CommandContainer name="TestError">
+					<EntryList />
 					<BaseContainer containerRef="AcubeSATTC" />
 				</CommandContainer>
 				<DefaultSignificance consequenceLevel="none" />
