@@ -217,6 +217,12 @@
 					<EntryList />
 					<BaseContainer containerRef="ECSSTCContainer" />
 				</CommandContainer>
+				<VerifierSet>
+					<FailedVerifier>
+						<ContainerRef containerRef="VerificationReport" />
+						<CheckWindow timeToStopChecking="PT2S" />
+					</FailedVerifier>
+				</VerifierSet>
 			</MetaCommand>
 			<MetaCommand name="Test">
 				<BaseMetaCommand metaCommandRef="AcubeSATTC">
