@@ -44,6 +44,15 @@
 					<Enumeration label="TC" value="1" />
 				</EnumerationList>
 			</EnumeratedParameterType>
+			<EnumeratedParameterType name="Temperature_Status_Type">
+				<UnitSet />
+				<IntegerDataEncoding sizeInBits="8"/>
+				<EnumerationList>
+					<Enumeration label="Nominal" value="0" />
+					<Enumeration label="Timeout" value="1" />
+					<Enumeration label="Disabled" value="2" />
+				</EnumerationList>
+			</EnumeratedParameterType>
 		</ParameterTypeSet>
 		<ParameterSet>
 			<Parameter name="ECSS_Version" parameterTypeRef="uint8_t" />
@@ -53,6 +62,9 @@
 			<Parameter name="ECSS_03_Housekeeping_Structure_ID" parameterTypeRef="uint8_t" />
 			<Parameter name="Temperature_1" parameterTypeRef="Temperature_Type" />
 			<Parameter name="Temperature_2" parameterTypeRef="Temperature_Type" />
+			<Parameter name="Status_Temperature_1" parameterTypeRef="Temperature_Status_Type" />
+			<Parameter name="Status_Temperature_2" parameterTypeRef="Temperature_Status_Type" />
+			<Parameter name="Temperature_Internal" parameterTypeRef="Temperature_Type" />
 			<Parameter name="Event_Definition_ID" parameterTypeRef="Event_Definition_ID_Type" />
 			<Parameter name="Verification_ECSS_Version" parameterTypeRef="Packet_Version_Type" />
 			<Parameter name="Verification_Packet_Type" parameterTypeRef="Packet_Type_Type" />
@@ -113,7 +125,10 @@
 			<SequenceContainer name="Housekeeping1">
 				<EntryList>
 					<ParameterRefEntry parameterRef="Temperature_1" />
+					<ParameterRefEntry parameterRef="Status_Temperature_1" />
 					<ParameterRefEntry parameterRef="Temperature_2" />
+					<ParameterRefEntry parameterRef="Status_Temperature_2" />
+					<ParameterRefEntry parameterRef="Temperature_Internal" />
 				</EntryList>
 				<BaseContainer containerRef="Housekeeping">
 					<RestrictionCriteria>
