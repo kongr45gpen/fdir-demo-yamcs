@@ -48,9 +48,9 @@
 				<UnitSet />
 				<IntegerDataEncoding sizeInBits="8"/>
 				<EnumerationList>
-					<Enumeration label="Nominal" value="0" />
-					<Enumeration label="Timeout" value="1" />
-					<Enumeration label="Disabled" value="2" />
+					<Enumeration label="Nominal" value="1" />
+					<Enumeration label="Timeout" value="2" />
+					<Enumeration label="Disabled" value="0" />
 				</EnumerationList>
 			</EnumeratedParameterType>
 		</ParameterTypeSet>
