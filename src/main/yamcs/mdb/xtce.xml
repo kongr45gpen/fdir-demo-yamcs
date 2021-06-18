@@ -255,6 +255,14 @@ if (messageType.value == 1) {
 					</SizeInBits>
 				</StringDataEncoding>
 			</StringArgumentType>
+			<EnumeratedArgumentType name="Temperature_Status_Type">
+				<UnitSet />
+				<IntegerDataEncoding sizeInBits="8"/>
+				<EnumerationList>
+					<Enumeration label="Nominal" value="1" />
+					<Enumeration label="Disabled" value="0" />
+				</EnumerationList>
+			</EnumeratedArgumentType>
 		</ArgumentTypeSet>
 		<MetaCommandSet>
 			<MetaCommand name="ECSSTC" abstract="true">
@@ -308,7 +316,7 @@ if (messageType.value == 1) {
 				</CommandContainer>
 				<DefaultSignificance consequenceLevel="none" />
 			</MetaCommand>
-			<MetaCommand name="ECSS03Enable">
+			<MetaCommand name="ST03_Enable">
 				<LongDescription>Enable the generation of housekeeping reports</LongDescription>
 				<BaseMetaCommand metaCommandRef="AcubeSATTC">
 					<ArgumentAssignmentList>
@@ -319,7 +327,7 @@ if (messageType.value == 1) {
 				<ArgumentList>
 					<Argument argumentTypeRef="AcubeSAT_ECSS_03_Definitions" name="Definition" shortDescription="Housekeeping Definition ID" />
 				</ArgumentList>
-				<CommandContainer name="ECSS03Enable">
+				<CommandContainer name="ST03_Enable">
 					<EntryList>
 						<FixedValueEntry name="N" binaryValue="01" sizeInBits="8"/>
 						<ArgumentRefEntry argumentRef="Definition" />
@@ -328,7 +336,7 @@ if (messageType.value == 1) {
 				</CommandContainer>
 				<DefaultSignificance consequenceLevel="warning" />
 			</MetaCommand>
-			<MetaCommand name="ECSS03Disable">
+			<MetaCommand name="ST03_Disable">
 				<LongDescription>Disable the generation of housekeeping reports</LongDescription>
 				<BaseMetaCommand metaCommandRef="AcubeSATTC">
 					<ArgumentAssignmentList>
@@ -339,7 +347,7 @@ if (messageType.value == 1) {
 				<ArgumentList>
 					<Argument argumentTypeRef="AcubeSAT_ECSS_03_Definitions" name="Definition" shortDescription="Housekeeping Definition ID" />
 				</ArgumentList>
-				<CommandContainer name="ECSS03Disable">
+				<CommandContainer name="ST03_Disable">
 					<EntryList>
 						<FixedValueEntry name="N" binaryValue="01" sizeInBits="8"/>
 						<ArgumentRefEntry argumentRef="Definition" />
@@ -348,7 +356,7 @@ if (messageType.value == 1) {
 				</CommandContainer>
 				<DefaultSignificance consequenceLevel="warning" />
 			</MetaCommand>
-			<MetaCommand name="ECSS03SetInterval">
+			<MetaCommand name="ST03_SetInterval">
 				<LongDescription>Set the generation interval of housekeeping reports</LongDescription>
 				<BaseMetaCommand metaCommandRef="AcubeSATTC">
 					<ArgumentAssignmentList>
@@ -360,7 +368,7 @@ if (messageType.value == 1) {
 					<Argument argumentTypeRef="AcubeSAT_ECSS_03_Definitions" name="Definition" shortDescription="Housekeeping Definition ID" />
 					<Argument argumentTypeRef="interval_ms_16" name="Collection_Interval" />
 				</ArgumentList>
-				<CommandContainer name="ECSS03SetInterval">
+				<CommandContainer name="ST03_SetInterval">
 					<EntryList>
 						<FixedValueEntry name="N" binaryValue="01" sizeInBits="8"/>
 						<ArgumentRefEntry argumentRef="Definition" />
@@ -445,6 +453,51 @@ if (messageType.value == 1) {
 					<BaseContainer containerRef="AcubeSATTC" />
 				</CommandContainer>
 				<DefaultSignificance consequenceLevel="warning" />
+			</MetaCommand>
+			<MetaCommand name="ST20_SetOne">
+				<LongDescription>Set one on-board parameter</LongDescription>
+				<BaseMetaCommand metaCommandRef="AcubeSATTC">
+					<ArgumentAssignmentList>
+						<ArgumentAssignment argumentName="ECSS_Service_Type" argumentValue="20" />
+						<ArgumentAssignment argumentName="ECSS_Message_Type" argumentValue="3" />
+					</ArgumentAssignmentList>
+				</BaseMetaCommand>
+				<CommandContainer name="ST20_SetOne">
+					<EntryList>
+						<FixedValueEntry name="N" binaryValue="0001" sizeInBits="16"/>
+					</EntryList>
+					<BaseContainer containerRef="AcubeSATTC" />
+				</CommandContainer>
+			</MetaCommand>
+			<MetaCommand name="Set_Temp1_Status">
+				<LongDescription>Set the status of temperature sensor 1</LongDescription>
+				<BaseMetaCommand metaCommandRef="ST20_SetOne" />
+				<ArgumentList>
+					<Argument argumentTypeRef="Temperature_Status_Type" name="Temperature_Status" shortDescription="Temperature sensor status" />
+				</ArgumentList>
+				<CommandContainer name="Set_Temp1_Status">
+					<EntryList>
+						<FixedValueEntry name="N" binaryValue="0003" sizeInBits="16"/>
+						<ArgumentRefEntry argumentRef="Temperature_Status" />
+					</EntryList>
+					<BaseContainer containerRef="ST20_SetOne" />
+				</CommandContainer>
+				<DefaultSignificance consequenceLevel="watch" />
+			</MetaCommand>
+			<MetaCommand name="Set_Temp2_Status">
+				<LongDescription>Set the status of temperature sensor 2</LongDescription>
+				<BaseMetaCommand metaCommandRef="ST20_SetOne" />
+				<ArgumentList>
+					<Argument argumentTypeRef="Temperature_Status_Type" name="Temperature_Status" shortDescription="Temperature sensor status" />
+				</ArgumentList>
+				<CommandContainer name="Set_Temp2_Status">
+					<EntryList>
+						<FixedValueEntry name="N" binaryValue="0004" sizeInBits="16"/>
+						<ArgumentRefEntry argumentRef="Temperature_Status" />
+					</EntryList>
+					<BaseContainer containerRef="ST20_SetOne" />
+				</CommandContainer>
+				<DefaultSignificance consequenceLevel="watch" />
 			</MetaCommand>
 		</MetaCommandSet>
 	</CommandMetaData>
