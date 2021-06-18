@@ -20,6 +20,12 @@
 				</UnitSet>
 				<FloatDataEncoding sizeInBits="32" />
 			</FloatParameterType>
+			<IntegerParameterType name="Tick_Type" signed="false">
+				<UnitSet>
+					<Unit>ms</Unit>
+				</UnitSet>
+				<IntegerDataEncoding sizeInBits="32" />
+			</IntegerParameterType>
 			<IntegerParameterType name="Packet_Version_Type" signed="false">
 				<UnitSet />
 				<IntegerDataEncoding sizeInBits="3" />
@@ -87,6 +93,7 @@
 			<Parameter name="Status_Temperature_1" parameterTypeRef="Temperature_Status_Type" />
 			<Parameter name="Status_Temperature_2" parameterTypeRef="Temperature_Status_Type" />
 			<Parameter name="Temperature_Internal" parameterTypeRef="Temperature_Type" />
+			<Parameter name="MCU_Ticks" parameterTypeRef="Tick_Type" />
 			<Parameter name="Event_Definition_ID" parameterTypeRef="Event_Definition_ID_Type" />
 			<Parameter name="Verification_ECSS_Version" parameterTypeRef="Packet_Version_Type" />
 			<Parameter name="Verification_Packet_Type" parameterTypeRef="Packet_Type_Type" />
@@ -151,6 +158,7 @@ if (messageType.value == 1) {
 					<ParameterRefEntry parameterRef="Temperature_2" />
 					<ParameterRefEntry parameterRef="Status_Temperature_2" />
 					<ParameterRefEntry parameterRef="Temperature_Internal" />
+					<ParameterRefEntry parameterRef="MCU_Ticks" />
 				</EntryList>
 				<BaseContainer containerRef="Housekeeping">
 					<RestrictionCriteria>
