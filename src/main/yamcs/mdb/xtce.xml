@@ -20,10 +20,6 @@
 				</UnitSet>
 				<FloatDataEncoding sizeInBits="32" />
 			</FloatParameterType>
-			<IntegerParameterType name="Event_Definition_ID_Type" signed="false">
-				<UnitSet />
-				<IntegerDataEncoding sizeInBits="16" />
-			</IntegerParameterType>
 			<IntegerParameterType name="Packet_Version_Type" signed="false">
 				<UnitSet />
 				<IntegerDataEncoding sizeInBits="3" />
@@ -53,6 +49,32 @@
 					<Enumeration label="Disabled" value="0" />
 				</EnumerationList>
 			</EnumeratedParameterType>
+			<EnumeratedParameterType name="Event_Definition_ID_Type">
+				<UnitSet />
+				<IntegerDataEncoding sizeInBits="16"/>
+				<EnumerationList>
+					<Enumeration label="Informative_Unknown" value="0" />
+					<Enumeration label="WWDG_Reset" value="1" />
+					<Enumeration label="Assertion_Fail" value="2" />
+					<Enumeration label="MCU_Start" value="3" />
+					<Enumeration label="LowSeverity_Unknown" value="4" />
+					<Enumeration label="MediumSeverity_Unknown" value="5" />
+					<Enumeration label="HighSeverity_Unknown" value="6" />
+					<Enumeration label="Failed_Start_Of_Execution" value="7" />
+					<Enumeration label="Temp1_Timeout_Temporary" value="100" />
+					<Enumeration label="Temp2_Timeout_Temporary" value="101" />
+					<Enumeration label="Temp1_Timeout_Permanent" value="102" />
+					<Enumeration label="Temp2_Timeout_Permanent" value="103" />
+					<Enumeration label="Temp1_UnexpectedValue_Temporary" value="104" />
+					<Enumeration label="Temp2_UnexpectedValue_Temporary" value="105" />
+					<Enumeration label="TempDelta_UnexpectedValue_Temporary" value="106" />
+					<Enumeration label="Temp1_UnexpectedValue_Permanent" value="107" />
+					<Enumeration label="Temp2_UnexpectedValue_Permanent" value="108" />
+					<Enumeration label="TempDelta_UnexpectedValue_Permanent" value="109" />
+					<Enumeration label="Subsystem_Overheat_Temp1" value="110" />
+					<Enumeration label="Subsystem_Overheat_Temp2" value="111" />
+				</EnumerationList>
+			</EnumeratedParameterType>
 		</ParameterTypeSet>
 		<ParameterSet>
 			<Parameter name="ECSS_Version" parameterTypeRef="uint8_t" />
@@ -79,17 +101,17 @@
 					<AncillaryData name="Yamcs:AlgorithmMandatoryInput">messageType</AncillaryData>
 				</AncillaryDataSet>
 				<AlgorithmText language="JavaScript">
-					if (eventID == null) return;
+if (eventID == null) return;
 
-					if (messageType.value == 1) {
-						Yamcs.watch("ECSS_Event_Parser", "ECSS_Informative_Event", "ECSS informative event " + eventID.value);
-					} else if (messageType.value == 2) {
-						Yamcs.warning("ECSS_Event_Parser", "ECSS_LowSev_Anomaly", "ECSS low severity anomaly " + eventID.value);
-					} else if (messageType.value == 3) {
-						Yamcs.distress("ECSS_Event_Parser", "ECSS_MedSev_Anomaly", "ECSS medium severity anomaly " + eventID.value);
-					} else if (messageType.value == 4) {
-						Yamcs.critical("ECSS_Event_Parser", "ECSS_HiSev_Anomaly", "ECSS high severity anomaly " + eventID.value);
-					}
+if (messageType.value == 1) {
+	Yamcs.watch("ECSS_Event_Parser", "ECSS_Informative_Event", "ECSS informative event " + eventID.rawValue + " " + eventID.value);
+} else if (messageType.value == 2) {
+	Yamcs.warning("ECSS_Event_Parser", "ECSS_LowSev_Anomaly", "ECSS low severity anomaly " + eventID.rawValue + " " + eventID.value);
+} else if (messageType.value == 3) {
+	Yamcs.distress("ECSS_Event_Parser", "ECSS_MedSev_Anomaly", "ECSS medium severity anomaly " + eventID.rawValue + " " + eventID.value);
+} else if (messageType.value == 4) {
+	Yamcs.critical("ECSS_Event_Parser", "ECSS_HiSev_Anomaly", "ECSS high severity anomaly " + eventID.rawValue + " " + eventID.value);
+}
 				</AlgorithmText>
 				<InputSet>
 					<InputParameterInstanceRef parameterRef="Event_Definition_ID" inputName="eventID" />
