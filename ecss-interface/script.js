@@ -48,12 +48,13 @@ const $pmonTable = document.getElementById('pmon-table');
 let pmons = {}
 
 receiveST12definitions = function() {
+    pmons = {};
     var http = new XMLHttpRequest();
     http.open("POST", "http://localhost:8090/api/processors/fdirdemo/realtime/commands/fdirdemo/ST12_ListAllDefinitions");
     http.send();
 }
 
-createPmonTable = function() {
+createPmonTable = _.throttle(function() {
     $pmonTable.innerHTML = '';
 
     for (const [pmonId, pmon] of Object.entries(pmons)) {
@@ -142,7 +143,7 @@ createPmonTable = function() {
 
         $pmonTable.appendChild(tr);
     }
-}
+}, 50, {'leading': false, 'trailing': true});
 
 websocket.onmessage = function (event) {
     var json = JSON.parse(event.data);
