@@ -47,6 +47,12 @@ const $pmonTable = document.getElementById('pmon-table');
 
 let pmons = {}
 
+receiveST12definitions = function() {
+    var http = new XMLHttpRequest();
+    http.open("POST", "http://localhost:8090/api/processors/fdirdemo/realtime/commands/fdirdemo/ST12_ListAllDefinitions");
+    http.send();
+}
+
 createPmonTable = function() {
     $pmonTable.innerHTML = '';
 
