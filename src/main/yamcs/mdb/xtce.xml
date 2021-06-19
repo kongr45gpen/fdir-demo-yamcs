@@ -240,7 +240,7 @@ if (messageType.value == 1) {
 				<StringDataEncoding>
 					<SizeInBits>
 						<Fixed>
-							<FixedValue>256</FixedValue>
+							<FixedValue>128</FixedValue>
 						</Fixed>
 					</SizeInBits>
 				</StringDataEncoding>
@@ -250,7 +250,7 @@ if (messageType.value == 1) {
 				<StringDataEncoding>
 					<SizeInBits>
 						<Fixed>
-							<FixedValue>256</FixedValue>
+							<FixedValue>128</FixedValue>
 						</Fixed>
 					</SizeInBits>
 				</StringDataEncoding>
@@ -454,7 +454,7 @@ if (messageType.value == 1) {
 				</CommandContainer>
 				<DefaultSignificance consequenceLevel="warning" />
 			</MetaCommand>
-			<MetaCommand name="ST20_SetOne">
+			<MetaCommand name="ST20_SetOne" abstract="true">
 				<LongDescription>Set one on-board parameter</LongDescription>
 				<BaseMetaCommand metaCommandRef="AcubeSATTC">
 					<ArgumentAssignmentList>
