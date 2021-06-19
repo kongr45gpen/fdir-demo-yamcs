@@ -10,9 +10,21 @@
 				<UnitSet />
 				<IntegerDataEncoding sizeInBits="16" />
 			</IntegerParameterType>
+			<IntegerParameterType name="uint32_t" signed="false">
+				<UnitSet />
+				<IntegerDataEncoding sizeInBits="32" />
+			</IntegerParameterType>
+			<IntegerParameterType name="uint64_t" signed="false">
+				<UnitSet />
+				<IntegerDataEncoding sizeInBits="64" />
+			</IntegerParameterType>
 			<FloatParameterType name="float_t">
 				<UnitSet />
 				<FloatDataEncoding sizeInBits="32" />
+			</FloatParameterType>
+			<FloatParameterType name="double_t">
+				<UnitSet />
+				<FloatDataEncoding sizeInBits="64" />
 			</FloatParameterType>
 			<FloatParameterType name="Temperature_Type">
 				<UnitSet>
@@ -81,6 +93,77 @@
 					<Enumeration label="Subsystem_Overheat_Temp2" value="111" />
 				</EnumerationList>
 			</EnumeratedParameterType>
+			<EnumeratedParameterType name="PMON_Definition_Check_ID_Type">
+				<UnitSet />
+				<IntegerDataEncoding sizeInBits="8"/>
+				<EnumerationList>
+					<Enumeration label="Expected_Value_Check" value="0" />
+					<Enumeration label="Limit_Check" value="1" />
+					<Enumeration label="Delta_Check" value="2" />
+				</EnumerationList>
+			</EnumeratedParameterType>
+			<EnumeratedParameterType name="PMON_Check_Status_Type">
+				<UnitSet />
+				<IntegerDataEncoding sizeInBits="8"/>
+				<EnumerationList>
+					<Enumeration label="OK" value="0" />
+					<Enumeration label="Unchecked" value="1" />
+					<Enumeration label="Invalid" value="2" />
+					<Enumeration label="Unexpected_Value" value="3" />
+					<Enumeration label="Below_Low_Limit" value="4" />
+					<Enumeration label="Above_High_Limit" value="5" />
+					<Enumeration label="Below_Low_Threshold" value="6" />
+					<Enumeration label="Above_High_Threshold" value="7" />
+				</EnumerationList>
+			</EnumeratedParameterType>
+			<AggregateParameterType name="PMON_Definition_Type">
+				<UnitSet />
+				<MemberList>
+					<Member name="PMON_ID" typeRef="uint16_t" />
+					<Member name="Monitored_Parameter_ID" typeRef="uint16_t" />
+					<Member name="Validity_Parameter_ID" typeRef="uint16_t" />
+					<Member name="Mask" typeRef="uint64_t" />
+					<Member name="Expected_Value" typeRef="uint64_t" />
+					<Member name="Monitoring_Interval" typeRef="uint32_t" />
+					<Member name="Check_Status" typeRef="PMON_Check_Status_Type" />
+					<Member name="Repetition_Number" typeRef="uint8_t" />
+					<Member name="Check_Type" typeRef="PMON_Definition_Check_ID_Type" />
+				</MemberList>
+			</AggregateParameterType>
+			<AggregateParameterType name="PMON_Expected_Value_Check_uint64_Type">
+				<UnitSet />
+				<MemberList>
+					<Member name="Mask" typeRef="uint64_t" />
+					<Member name="Expected_Value" typeRef="uint64_t" />
+					<Member name="Event_Definition_ID" typeRef="Event_Definition_ID_Type" />
+				</MemberList>
+			</AggregateParameterType>
+			<AggregateParameterType name="PMON_Expected_Value_Check_Temperature_Status_Type">
+				<UnitSet />
+				<MemberList>
+					<Member name="Mask" typeRef="uint64_t" />
+					<Member name="Expected_Value" typeRef="Temperature_Status_Type" />
+					<Member name="Event_Definition_ID" typeRef="Event_Definition_ID_Type" />
+				</MemberList>
+			</AggregateParameterType>
+			<AggregateParameterType name="PMON_Limit_Check_Float_Type">
+				<UnitSet />
+				<MemberList>
+					<Member name="Low_Limit" typeRef="float_t" />
+					<Member name="Low_Event" typeRef="Event_Definition_ID_Type" />
+					<Member name="High_Limit" typeRef="float_t" />
+					<Member name="High_Event" typeRef="Event_Definition_ID_Type" />
+				</MemberList>
+			</AggregateParameterType>
+			<AggregateParameterType name="PMON_Limit_Check_Double_Type">
+				<UnitSet />
+				<MemberList>
+					<Member name="Low_Limit" typeRef="double_t" />
+					<Member name="Low_Event" typeRef="Event_Definition_ID_Type" />
+					<Member name="High_Limit" typeRef="double_t" />
+					<Member name="High_Event" typeRef="Event_Definition_ID_Type" />
+				</MemberList>
+			</AggregateParameterType>
 		</ParameterTypeSet>
 		<ParameterSet>
 			<Parameter name="ECSS_Version" parameterTypeRef="uint8_t" />
@@ -100,6 +183,12 @@
 			<Parameter name="Verification_APID" parameterTypeRef="APID_Type" />
 			<Parameter name="Verification_Packet_Sequence_Count" parameterTypeRef="Packet_Sequence_Count_Type" />
 			<Parameter name="Verification_Code" parameterTypeRef="uint16_t" />
+			<Parameter name="Monitoring_Definition_Count" parameterTypeRef="uint8_t" />
+			<Parameter name="Monitoring_Definition" parameterTypeRef="PMON_Definition_Type" />
+			<Parameter name="PMON_Expected_Value_Check_uint64" parameterTypeRef="PMON_Expected_Value_Check_uint64_Type" />
+			<Parameter name="PMON_Expected_Value_Check_Temperature_Status" parameterTypeRef="PMON_Expected_Value_Check_Temperature_Status_Type" />
+			<Parameter name="PMON_Limit_Check_Float" parameterTypeRef="PMON_Limit_Check_Float_Type" />
+			<Parameter name="PMON_Limit_Check_Double" parameterTypeRef="PMON_Limit_Check_Double_Type" />
 		</ParameterSet>
 		<AlgorithmSet>
 			<CustomAlgorithm name="EventTranscriberAlgorithm">
@@ -202,6 +291,48 @@ if (messageType.value == 1) {
 					<RestrictionCriteria>
 						<ComparisonList>
 							<Comparison value="1" parameterRef="ECSS_Service_Type" />
+						</ComparisonList>
+					</RestrictionCriteria>
+				</BaseContainer>
+			</SequenceContainer>
+			<SequenceContainer name="MonitoringDefinitions">
+				<EntryList>
+					<ParameterRefEntry parameterRef="Monitoring_Definition_Count" />
+					<ParameterRefEntry parameterRef="Monitoring_Definition" />
+				</EntryList>
+				<BaseContainer containerRef="ECSSTM">
+					<RestrictionCriteria>
+						<ComparisonList>
+							<Comparison value="12" parameterRef="ECSS_Service_Type" />
+							<Comparison value="9" parameterRef="ECSS_Message_Type" />
+						</ComparisonList>
+					</RestrictionCriteria>
+				</BaseContainer>
+			</SequenceContainer>
+			<SequenceContainer name="MonitoringDefinition_ExpectedValue_TemperatureStatus">
+				<EntryList>
+					<ParameterRefEntry parameterRef="PMON_Expected_Value_Check_Temperature_Status" />
+				</EntryList>
+				<BaseContainer containerRef="MonitoringDefinitions">
+					<RestrictionCriteria>
+						<ComparisonList>
+							<Comparison value="1" parameterRef="Monitoring_Definition_Count" />
+							<Comparison value="Expected_Value_Check" parameterRef="Monitoring_Definition.Check_Type" />
+							<Comparison comparisonOperator="&gt;=" value="3" parameterRef="Monitoring_Definition.Monitored_Parameter_ID" />
+							<Comparison comparisonOperator="&lt;=" value="5" parameterRef="Monitoring_Definition.Monitored_Parameter_ID" />
+						</ComparisonList>
+					</RestrictionCriteria>
+				</BaseContainer>
+			</SequenceContainer>
+			<SequenceContainer name="MonitoringDefinition_Limit_Float">
+				<EntryList>
+					<ParameterRefEntry parameterRef="PMON_Limit_Check_Float" />
+				</EntryList>
+				<BaseContainer containerRef="MonitoringDefinitions">
+					<RestrictionCriteria>
+						<ComparisonList>
+							<Comparison value="1" parameterRef="Monitoring_Definition_Count" />
+							<Comparison value="Limit_Check" parameterRef="Monitoring_Definition.Check_Type" />
 						</ComparisonList>
 					</RestrictionCriteria>
 				</BaseContainer>
@@ -498,6 +629,22 @@ if (messageType.value == 1) {
 					<BaseContainer containerRef="ST20_SetOne" />
 				</CommandContainer>
 				<DefaultSignificance consequenceLevel="watch" />
+			</MetaCommand>
+			<MetaCommand name="ST12_ListAllDefinitions">
+				<LongDescription>Report the list of all parameter monitoring definitions</LongDescription>
+				<BaseMetaCommand metaCommandRef="AcubeSATTC">
+					<ArgumentAssignmentList>
+						<ArgumentAssignment argumentName="ECSS_Service_Type" argumentValue="12" />
+						<ArgumentAssignment argumentName="ECSS_Message_Type" argumentValue="8" />
+					</ArgumentAssignmentList>
+				</BaseMetaCommand>
+				<CommandContainer name="ST12_ListAllDefinitions">
+					<EntryList>
+						<FixedValueEntry name="N" binaryValue="00" sizeInBits="8"/>
+					</EntryList>
+					<BaseContainer containerRef="AcubeSATTC" />
+				</CommandContainer>
+				<DefaultSignificance consequenceLevel="none" />
 			</MetaCommand>
 		</MetaCommandSet>
 	</CommandMetaData>
