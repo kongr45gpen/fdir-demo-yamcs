@@ -43,12 +43,98 @@ websocket.onopen = function (event) {
 }
 
 const $timestamp = document.getElementById('timestamp');
+const $pmonTable = document.getElementById('pmon-table');
 
 let pmons = {}
 
 createPmonTable = function() {
-    for (const [pmonId, pmon] of Object.entries(pmons)) {
+    $pmonTable.innerHTML = '';
 
+    for (const [pmonId, pmon] of Object.entries(pmons)) {
+        var tr = document.createElement('tr');
+
+        var tds = _.map(new Array(8), function (e) { return document.createElement('td')});
+
+        tds[0].appendChild(document.createTextNode(pmonId));
+        tds[1].appendChild(document.createTextNode(pmon.parameter));
+        tds[1].classList.add("table-parameter");
+
+        if (pmon.validity) {
+            var lis = _.map(new Array(2), function (e) { return document.createElement('p')});
+            lis[0].appendChild(document.createTextNode(pmon.validity.parameter));
+            lis[1].appendChild(document.createTextNode(pmon.validity.value));
+            lis[1].appendChild(document.createElement('span'));
+            lis[1].childNodes[1].classList.add('mdl-chip');
+            lis[1].childNodes[1].classList.add('mdl-chip-table');
+            lis[1].childNodes[1].appendChild(document.createElement('code'));
+            lis[1].childNodes[1].childNodes[0].classList.add('mdl-chip__text');
+            lis[1].childNodes[1].childNodes[0].appendChild(document.createTextNode(pmon.validity.mask))
+            tds[2].appendChild(lis[0]);
+            tds[2].appendChild(lis[1]);
+        }
+
+        tds[3].appendChild(document.createTextNode(pmon.monitoring_interval));
+        tds[4].appendChild(document.createTextNode(pmon.status));
+
+        if (pmon.status == "Invalid") {
+            tds[4].style.color = "#ff8f00";
+            tds[4].style.fontWeight = "600";
+        } else if (pmon.status != "OK") {
+            tds[4].style.color = "#c62828";
+            tds[4].style.fontWeight = "600";
+        }
+
+        tds[5].appendChild(document.createTextNode(pmon.repetition_number));
+
+        if (pmon.check_type == "Limit_Check") {
+            nodes = []
+            nodes[0] = document.createElement('p');
+            nodes[0].appendChild(document.createTextNode(pmon.check.low + " ≤ " + "x" + " ≤ " + pmon.check.high))
+            nodes[1] = document.createElement('span');
+            nodes[1].classList.add('mdl-chip');
+            nodes[1].classList.add('mdl-chip-long');
+            nodes[1].appendChild(document.createElement('span'));
+            nodes[1].childNodes[0].classList.add('mdl-chip__text');
+            nodes[1].childNodes[0].appendChild(document.createTextNode(pmon.check.low_event))
+            nodes[2] = document.createElement('span');
+            nodes[2].classList.add('mdl-chip');
+            nodes[2].classList.add('mdl-chip-long');
+            nodes[2].appendChild(document.createElement('span'));
+            nodes[2].childNodes[0].classList.add('mdl-chip__text');
+            nodes[2].childNodes[0].appendChild(document.createTextNode(pmon.check.high_event))
+
+            tds[6].appendChild(nodes[0])
+            tds[6].appendChild(nodes[1])
+            tds[6].appendChild(nodes[2])
+        } else {
+            nodes = []
+            nodes[0] = document.createElement('p');
+            nodes[0].appendChild(document.createTextNode("x" + " = " + pmon.check.value))
+            nodes[1] = document.createElement('span');
+            nodes[1].classList.add('mdl-chip');
+            nodes[1].classList.add('mdl-chip-table');
+            nodes[1].appendChild(document.createElement('span'));
+            nodes[1].childNodes[0].classList.add('mdl-chip__text');
+            nodes[1].childNodes[0].appendChild(document.createTextNode(pmon.check.mask))
+            nodes[0].appendChild(nodes[1]);
+            nodes[2] = document.createElement('span');
+            nodes[2].classList.add('mdl-chip');
+            nodes[2].classList.add('mdl-chip-long');
+            nodes[2].appendChild(document.createElement('span'));
+            nodes[2].childNodes[0].classList.add('mdl-chip__text');
+            nodes[2].childNodes[0].appendChild(document.createTextNode(pmon.check.event))
+
+            tds[6].appendChild(nodes[0])
+            tds[6].appendChild(nodes[2])
+        }
+
+        tds[7].appendChild(document.createTextNode(pmon.date))
+
+        for (const td of Object.values(tds)) {
+            tr.appendChild(td);
+        }
+
+        $pmonTable.appendChild(tr);
     }
 }
 
@@ -78,7 +164,7 @@ websocket.onmessage = function (event) {
             checkData = {
                 "mask": "0x" + check("Mask").uint32Value.toString(16),
                 "value": check("Expected_Value").stringValue ? check("Expected_Value").stringValue : check("Expected_Value").uint32Value,
-                "event": check("Event_Definition_ID")
+                "event": check("Event_Definition_ID").stringValue
             }
         } else {
             checkData = {
@@ -99,9 +185,11 @@ websocket.onmessage = function (event) {
             "monitoring_interval": monitoring("Monitoring_Interval").uint32Value + " ms",
             "status": monitoring("Check_Status").stringValue,
             "repetition_number": monitoring("Repetition_Number").uint32Value,
-            "check": checkData
+            "check": checkData,
+            "check_type": monitoring("Check_Type").stringValue,
+            "date": monitoringRaw.generationTime
         }
 
-        console.log(pmons);
+        createPmonTable();
     }
 }
