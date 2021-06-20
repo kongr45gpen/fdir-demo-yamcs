@@ -39,6 +39,7 @@ var parameterRequest = {
 }
 
 var EventEnumeration = {}
+var CheckStatusEnumeration = {}
 
 var websocket = new WebSocket("ws://localhost:8090/api/websocket")
 
@@ -56,6 +57,13 @@ let pmons = {}
 let events = {};
 let transitions = [];
 
+findkey = function(array) {
+    return function(key) {
+        var index = _.findIndex(array.name, function(e) { return e == key })
+        return array.value[index];
+    }
+}
+
 getEnumerations = function() {
     var http = new XMLHttpRequest();
     http.addEventListener("load", function() {
@@ -67,15 +75,15 @@ getEnumerations = function() {
     http.open("GET", "http://localhost:8090/api/mdb/fdirdemo/parameters/fdirdemo/Event_Definition_ID");
     http.send();
 
-    // var http2 = new XMLHttpRequest();
-    // http2.addEventListener("load", function() {
-    //     var json = JSON.parse(this.responseText);
-    //     for (var value of json.type.enumValue) {
-    //         EventEnumeration[parseInt(value.value)] = value.label;
-    //     }
-    // })
-    // http2.open("GET", "http://localhost:8090/api/mdb/fdirdemo/parameters/fdirdemo/Event_Definition_ID");
-    // http2.send();
+    var http2 = new XMLHttpRequest();
+    http2.addEventListener("load", function() {
+        var json = JSON.parse(this.responseText);
+        for (var value of _.find(json.type.member, {name: 'Check_Status'}).type.enumValue) {
+            CheckStatusEnumeration[parseInt(value.value)] = value.label;
+        }
+    })
+    http2.open("GET", "http://localhost:8090/api/mdb/fdirdemo/parameters/fdirdemo/PMON_Monitoring_Definition");
+    http2.send();
 }
 getEnumerations();
 
@@ -111,6 +119,9 @@ colourStatus = function(element)  {
     if (text == "Invalid") {
         element.style.color = "#ff8f00";
         element.style.fontWeight = 600;
+    } else if (text == "Unchecked") {
+        element.style.colour = "#757575";
+        element.style.fontWeight = 500;
     } else if (text != "OK") {
         element.style.color = "#c62828";
         element.style.fontWeight = 600;
@@ -274,15 +285,6 @@ createTransitionTable = _.throttle(function() {
     }
 }, 50, {'leading': false, 'trailing': true});
 
-
-findkey = function(array) {
-    return function(key) {
-        var index = _.findIndex(array.name, function(e) { return e == key })
-
-        return array.value[index];
-    }
-}
-
 websocket.onmessage = function (event) {
     var json = JSON.parse(event.data);
     console.log(json);
@@ -380,8 +382,8 @@ createEventActionTable = _.throttle(function() {
                     "parameter": Parameters[check("Monitored_Parameter_ID").uint32Value],
                     "check_type": check("Check_Type").uint32Value,
                     "value": check("Value").floatValue,
-                    "previous": check("Previous_Check_Status").uint32Value,
-                    "current": check("Current_Check_Status").uint32Value,
+                    "previous": CheckStatusEnumeration[check("Previous_Check_Status").uint32Value],
+                    "current": CheckStatusEnumeration[check("Current_Check_Status").uint32Value],
                     "timestamp": check("Timestamp").uint32Value
                 }
 
