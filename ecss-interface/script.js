@@ -31,7 +31,8 @@ var parameterRequest = {
             { name: "/fdirdemo/PMON_Limit_Check_Float"},
             { name: "/fdirdemo/PMON_Expected_Value_Check_uint64"},
             { name: "/fdirdemo/PMON_Expected_Value_Check_Temperature_Status"},
-            { name: "/fdirdemo/EventAction_List" }
+            { name: "/fdirdemo/EventAction_List" },
+            { name: "/fdirdemo/EventAction_Definition" }
         ]
     }
 }
@@ -77,6 +78,19 @@ getST19definitions = function() {
     var http = new XMLHttpRequest();
     http.open("POST", "http://localhost:8090/api/processors/fdirdemo/realtime/commands/fdirdemo/ST19_ListAllEventAction");
     http.send();
+}
+
+getST19requests = function() {
+    for (key in events) {
+        console.log(key)
+        var http = new XMLHttpRequest();
+        http.open("POST", "http://localhost:8090/api/processors/fdirdemo/realtime/commands/fdirdemo/ST19_ListEventActionRequest");
+        http.send(JSON.stringify({
+            assignment: [
+                {name: "Event_Action_Definition_ID", value: key }
+            ]
+        }));
+    }
 }
 
 createPmonTable = _.throttle(function() {
@@ -175,7 +189,7 @@ createEventActionTable = _.throttle(function() {
 
     for (const [eventActionID, eventAction] of Object.entries(events)) {
         var tr = document.createElement('tr');
-        var tds = _.map(new Array(3), function (e) { return document.createElement('td')});
+        var tds = _.map(new Array(4), function (e) { return document.createElement('td')});
 
         tds[0].appendChild(document.createTextNode(eventActionID));
 
@@ -192,6 +206,16 @@ createEventActionTable = _.throttle(function() {
         } else {
             tds[2].appendChild(document.createTextNode("Off"));
             tds[2].classList.add('mdl-color-text--red-300');
+        }
+
+        if (eventAction.request) {
+            tds[3].appendChild(document.createTextNode("TC[" + eventAction.request.service + "," + eventAction.request.message + "] "));
+            tds[3].appendChild(document.createElement('span'));
+            tds[3].childNodes[1].classList.add('mdl-typography--font-light');
+            tds[3].childNodes[1].appendChild(document.createTextNode(eventAction.request.content1 + " "));
+            tds[3].appendChild(document.createElement('span'));
+            tds[3].childNodes[2].classList.add('mdl-typography--font-light');
+            tds[3].childNodes[2].appendChild(document.createTextNode(eventAction.request.content2));
         }
 
         for (const td of Object.values(tds)) {
@@ -216,7 +240,9 @@ websocket.onmessage = function (event) {
     if (json.type == "time") {
         $timestamp.innerText = json.data.value;
     } else if (json.type == "parameters") {
+        var monitoringRaw = _.find(json.data.values, {'numericId': 1});
         var eventActionRaw = _.find(json.data.values, {'numericId': 6});
+        var eventActionRequestRaw = _.find(json.data.values, {'numericId': 7});
 
         if (eventActionRaw) {
             var eventActionList = eventActionRaw.engValue.arrayValue;
@@ -234,8 +260,25 @@ websocket.onmessage = function (event) {
             }
 
             createEventActionTable();
-        } else {
-            var monitoringRaw = _.find(json.data.values, {'numericId': 1});
+        }
+        if (eventActionRequestRaw) {
+            var eventActionRequest = findkey(eventActionRequestRaw.engValue.aggregateValue);
+            var id = eventActionRequest("EventAction_Definition_ID").uint32Value;
+            var text = eventActionRequest("TC").stringValue;
+            var request = {
+                text: text,
+                service: text.charCodeAt(1),
+                message: text.charCodeAt(2),
+                content: text.substr(5),
+                content1: text.substr(5, 16),
+                content2: text.substr(5 + 16, 16)
+            }
+
+            events[id]["request"] = request;
+
+            createEventActionTable();
+        }
+        if (monitoringRaw) {
             var checkRaw = _.find(json.data.values, function(e) { return e.numericId != 1 });
 
             monitoring = findkey(monitoringRaw.engValue.aggregateValue);
