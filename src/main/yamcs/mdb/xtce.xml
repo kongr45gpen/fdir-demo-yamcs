@@ -418,6 +418,32 @@ if (messageType.value == 1) {
 					<Enumeration value="1" label="Temperature Housekeeping" />
 				</EnumerationList>
 			</EnumeratedArgumentType>
+			<EnumeratedArgumentType name="Event_Definition_ID_Type">
+				<UnitSet />
+				<IntegerDataEncoding sizeInBits="16"/>
+				<EnumerationList>
+					<Enumeration label="Informative_Unknown" value="0" />
+					<Enumeration label="WWDG_Reset" value="1" />
+					<Enumeration label="Assertion_Fail" value="2" />
+					<Enumeration label="MCU_Start" value="3" />
+					<Enumeration label="LowSeverity_Unknown" value="4" />
+					<Enumeration label="MediumSeverity_Unknown" value="5" />
+					<Enumeration label="HighSeverity_Unknown" value="6" />
+					<Enumeration label="Failed_Start_Of_Execution" value="7" />
+					<Enumeration label="Temp1_Timeout_Temporary" value="100" />
+					<Enumeration label="Temp2_Timeout_Temporary" value="101" />
+					<Enumeration label="Temp1_Timeout_Permanent" value="102" />
+					<Enumeration label="Temp2_Timeout_Permanent" value="103" />
+					<Enumeration label="Temp1_UnexpectedValue_Temporary" value="104" />
+					<Enumeration label="Temp2_UnexpectedValue_Temporary" value="105" />
+					<Enumeration label="TempDelta_UnexpectedValue_Temporary" value="106" />
+					<Enumeration label="Temp1_UnexpectedValue_Permanent" value="107" />
+					<Enumeration label="Temp2_UnexpectedValue_Permanent" value="108" />
+					<Enumeration label="TempDelta_UnexpectedValue_Permanent" value="109" />
+					<Enumeration label="Subsystem_Overheat_Temp1" value="110" />
+					<Enumeration label="Subsystem_Overheat_Temp2" value="111" />
+				</EnumerationList>
+			</EnumeratedArgumentType>
 			<StringArgumentType name="ECSS_Function_Name_Type">
 				<UnitSet />
 				<StringDataEncoding>
@@ -750,6 +776,48 @@ if (messageType.value == 1) {
 					<BaseContainer containerRef="AcubeSATTC" />
 				</CommandContainer>
 				<DefaultSignificance consequenceLevel="distress" />
+			</MetaCommand>
+			<MetaCommand name="ST19_Enable_Definition" shortDescription="Enable one event-action definition">
+				<BaseMetaCommand metaCommandRef="AcubeSATTC">
+					<ArgumentAssignmentList>
+						<ArgumentAssignment argumentName="ECSS_Service_Type" argumentValue="19" />
+						<ArgumentAssignment argumentName="ECSS_Message_Type" argumentValue="4" />
+					</ArgumentAssignmentList>
+				</BaseMetaCommand>
+				<ArgumentList>
+					<Argument argumentTypeRef="Event_Definition_ID_Type" name="Event_Definition_ID" />
+				</ArgumentList>
+				<CommandContainer name="ST19_Enable_Definition">
+					<EntryList>
+						<FixedValueEntry name="N" binaryValue="0001" sizeInBits="16" />
+						<FixedValueEntry name="APID" binaryValue="0000" sizeInBits="16" />
+						<ArgumentRefEntry argumentRef="Event_Definition_ID" />
+						<FixedValueEntry name="Event_Action_Definition_ID" binaryValue="0000" sizeInBits="16" />
+					</EntryList>
+					<BaseContainer containerRef="AcubeSATTC" />
+				</CommandContainer>
+				<DefaultSignificance consequenceLevel="warning" />
+			</MetaCommand>
+			<MetaCommand name="ST19_Disable_Definition" shortDescription="Disable one event-action definition">
+				<BaseMetaCommand metaCommandRef="AcubeSATTC">
+					<ArgumentAssignmentList>
+						<ArgumentAssignment argumentName="ECSS_Service_Type" argumentValue="19" />
+						<ArgumentAssignment argumentName="ECSS_Message_Type" argumentValue="5" />
+					</ArgumentAssignmentList>
+				</BaseMetaCommand>
+				<ArgumentList>
+					<Argument argumentTypeRef="Event_Definition_ID_Type" name="Event_Definition_ID" />
+				</ArgumentList>
+				<CommandContainer name="ST19_Disable_Definition">
+					<EntryList>
+						<FixedValueEntry name="N" binaryValue="0001" sizeInBits="16" />
+						<FixedValueEntry name="APID" binaryValue="0000" sizeInBits="16" />
+						<ArgumentRefEntry argumentRef="Event_Definition_ID" />
+						<FixedValueEntry name="Event_Action_Definition_ID" binaryValue="0000" sizeInBits="16" />
+					</EntryList>
+					<BaseContainer containerRef="AcubeSATTC" />
+				</CommandContainer>
+				<DefaultSignificance consequenceLevel="warning" />
 			</MetaCommand>
 		</MetaCommandSet>
 	</CommandMetaData>
