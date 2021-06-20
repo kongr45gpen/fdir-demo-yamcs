@@ -499,8 +499,7 @@ if (messageType.value == 1) {
 				</CommandContainer>
 				<DefaultSignificance consequenceLevel="none" />
 			</MetaCommand>
-			<MetaCommand name="ST03_Enable">
-				<LongDescription>Enable the generation of housekeeping reports</LongDescription>
+			<MetaCommand name="ST03_Enable" shortDescription="Enable the generation of housekeeping reports">
 				<BaseMetaCommand metaCommandRef="AcubeSATTC">
 					<ArgumentAssignmentList>
 						<ArgumentAssignment argumentName="ECSS_Service_Type" argumentValue="3" />
@@ -519,8 +518,7 @@ if (messageType.value == 1) {
 				</CommandContainer>
 				<DefaultSignificance consequenceLevel="warning" />
 			</MetaCommand>
-			<MetaCommand name="ST03_Disable">
-				<LongDescription>Disable the generation of housekeeping reports</LongDescription>
+			<MetaCommand name="ST03_Disable" shortDescription="Disable the generation of housekeeping reports">
 				<BaseMetaCommand metaCommandRef="AcubeSATTC">
 					<ArgumentAssignmentList>
 						<ArgumentAssignment argumentName="ECSS_Service_Type" argumentValue="3" />
@@ -539,8 +537,7 @@ if (messageType.value == 1) {
 				</CommandContainer>
 				<DefaultSignificance consequenceLevel="warning" />
 			</MetaCommand>
-			<MetaCommand name="ST03_SetInterval">
-				<LongDescription>Set the generation interval of housekeeping reports</LongDescription>
+			<MetaCommand name="ST03_SetInterval" shortDescription="Set the generation interval of housekeeping reports">
 				<BaseMetaCommand metaCommandRef="AcubeSATTC">
 					<ArgumentAssignmentList>
 						<ArgumentAssignment argumentName="ECSS_Service_Type" argumentValue="3" />
@@ -561,8 +558,7 @@ if (messageType.value == 1) {
 				</CommandContainer>
 				<DefaultSignificance consequenceLevel="watch" />
 			</MetaCommand>
-			<MetaCommand name="TestError">
-				<LongDescription>An erroneous command to test parsing errors</LongDescription>
+			<MetaCommand name="TestError" shortDescription="An erroneous command to test parsing errors">
 				<BaseMetaCommand metaCommandRef="AcubeSATTC">
 					<ArgumentAssignmentList>
 						<ArgumentAssignment argumentName="ECSS_Service_Type" argumentValue="95" />
@@ -575,8 +571,7 @@ if (messageType.value == 1) {
 				</CommandContainer>
 				<DefaultSignificance consequenceLevel="none" />
 			</MetaCommand>
-			<MetaCommand name="ST08_Function" abstract="true">
-				<LongDescription>Run an ST[08] on-board function</LongDescription>
+			<MetaCommand name="ST08_Function" abstract="true" shortDescription="Run an ST[08] on-board function">
 				<ArgumentList>
 					<Argument argumentTypeRef="ECSS_Function_Name_Type" name="ECSS_Function_Name" shortDescription="Function definition name" />
 					<Argument argumentTypeRef="ECSS_Function_Data_Type" name="ECSS_Function_Data" shortDescription="Auxiliary data to include" initialValue="0" />
@@ -596,8 +591,7 @@ if (messageType.value == 1) {
 				</CommandContainer>
 				<DefaultSignificance consequenceLevel="none" />
 			</MetaCommand>
-			<MetaCommand name="MCU_Reset">
-				<LongDescription>Perform a soft reset of the MCU</LongDescription>
+			<MetaCommand name="MCU_Reset" shortDescription="Perform a soft reset of the MCU">
 				<BaseMetaCommand metaCommandRef="ST08_Function">
 					<ArgumentAssignmentList>
 						<ArgumentAssignment argumentName="ECSS_Function_Name" argumentValue="restart" />
@@ -609,8 +603,7 @@ if (messageType.value == 1) {
 				</CommandContainer>
 				<DefaultSignificance consequenceLevel="warning" />
 			</MetaCommand>
-			<MetaCommand name="Sensor1_Restart">
-				<LongDescription>Restart Sensor 1</LongDescription>
+			<MetaCommand name="Sensor1_Restart" shortDescription="Restart Sensor 1">
 				<BaseMetaCommand metaCommandRef="ST08_Function">
 					<ArgumentAssignmentList>
 						<ArgumentAssignment argumentName="ECSS_Function_Name" argumentValue="restart_sensor" />
@@ -623,8 +616,7 @@ if (messageType.value == 1) {
 				</CommandContainer>
 				<DefaultSignificance consequenceLevel="watch" />
 			</MetaCommand>
-			<MetaCommand name="Sensor2_Restart">
-				<LongDescription>Restart Sensor 2</LongDescription>
+			<MetaCommand name="Sensor2_Restart" shortDescription="Restart Sensor 2">
 				<BaseMetaCommand metaCommandRef="ST08_Function">
 					<ArgumentAssignmentList>
 						<ArgumentAssignment argumentName="ECSS_Function_Name" argumentValue="restart_sensor" />
@@ -637,8 +629,7 @@ if (messageType.value == 1) {
 				</CommandContainer>
 				<DefaultSignificance consequenceLevel="watch" />
 			</MetaCommand>
-			<MetaCommand name="OnBoardMonitoring_Enable">
-				<LongDescription>Enable the entire on-board monitoring function</LongDescription>
+			<MetaCommand name="OnBoardMonitoring_Enable" shortDescription="Enable the entire on-board monitoring function">
 				<BaseMetaCommand metaCommandRef="AcubeSATTC">
 					<ArgumentAssignmentList>
 						<ArgumentAssignment argumentName="ECSS_Service_Type" argumentValue="12" />
@@ -651,8 +642,7 @@ if (messageType.value == 1) {
 				</CommandContainer>
 				<DefaultSignificance consequenceLevel="distress" />
 			</MetaCommand>
-			<MetaCommand name="OnBoardMonitoring_Disable">
-				<LongDescription>Disable the entire on-board monitoring function</LongDescription>
+			<MetaCommand name="OnBoardMonitoring_Disable" shortDescription="Disable the entire on-board monitoring function">
 				<BaseMetaCommand metaCommandRef="AcubeSATTC">
 					<ArgumentAssignmentList>
 						<ArgumentAssignment argumentName="ECSS_Service_Type" argumentValue="12" />
@@ -665,8 +655,7 @@ if (messageType.value == 1) {
 				</CommandContainer>
 				<DefaultSignificance consequenceLevel="distress" />
 			</MetaCommand>
-			<MetaCommand name="ST20_SetOne" abstract="true">
-				<LongDescription>Set one on-board parameter</LongDescription>
+			<MetaCommand name="ST20_SetOne" abstract="true" shortDescription="Set one on-board parameter">
 				<BaseMetaCommand metaCommandRef="AcubeSATTC">
 					<ArgumentAssignmentList>
 						<ArgumentAssignment argumentName="ECSS_Service_Type" argumentValue="20" />
@@ -680,8 +669,7 @@ if (messageType.value == 1) {
 					<BaseContainer containerRef="AcubeSATTC" />
 				</CommandContainer>
 			</MetaCommand>
-			<MetaCommand name="Set_Temp1_Status">
-				<LongDescription>Set the status of temperature sensor 1</LongDescription>
+			<MetaCommand name="Set_Temp1_Status" shortDescription="Set the status of temperature sensor 1">
 				<BaseMetaCommand metaCommandRef="ST20_SetOne" />
 				<ArgumentList>
 					<Argument argumentTypeRef="Temperature_Status_Type" name="Temperature_Status" shortDescription="Temperature sensor status" />
@@ -695,8 +683,7 @@ if (messageType.value == 1) {
 				</CommandContainer>
 				<DefaultSignificance consequenceLevel="watch" />
 			</MetaCommand>
-			<MetaCommand name="Set_Temp2_Status">
-				<LongDescription>Set the status of temperature sensor 2</LongDescription>
+			<MetaCommand name="Set_Temp2_Status" shortDescription="Set the status of temperature sensor 2">
 				<BaseMetaCommand metaCommandRef="ST20_SetOne" />
 				<ArgumentList>
 					<Argument argumentTypeRef="Temperature_Status_Type" name="Temperature_Status" shortDescription="Temperature sensor status" />
@@ -710,8 +697,7 @@ if (messageType.value == 1) {
 				</CommandContainer>
 				<DefaultSignificance consequenceLevel="watch" />
 			</MetaCommand>
-			<MetaCommand name="ST12_ListAllDefinitions">
-				<LongDescription>Report the list of all parameter monitoring definitions</LongDescription>
+			<MetaCommand name="ST12_ListAllDefinitions" shortDescription="Report the list of all parameter monitoring definitions">
 				<BaseMetaCommand metaCommandRef="AcubeSATTC">
 					<ArgumentAssignmentList>
 						<ArgumentAssignment argumentName="ECSS_Service_Type" argumentValue="12" />
@@ -726,8 +712,7 @@ if (messageType.value == 1) {
 				</CommandContainer>
 				<DefaultSignificance consequenceLevel="none" />
 			</MetaCommand>
-			<MetaCommand name="ST19_ListAllEventAction">
-				<LongDescription>Report the list of all event-action definitions</LongDescription>
+			<MetaCommand name="ST19_ListAllEventAction" shortDescription="Report the list of all event-action definitions">
 				<BaseMetaCommand metaCommandRef="AcubeSATTC">
 					<ArgumentAssignmentList>
 						<ArgumentAssignment argumentName="ECSS_Service_Type" argumentValue="19" />
@@ -740,8 +725,7 @@ if (messageType.value == 1) {
 				</CommandContainer>
 				<DefaultSignificance consequenceLevel="none" />
 			</MetaCommand>
-			<MetaCommand name="ST19_Enable">
-				<LongDescription>Enable the event-action function</LongDescription>
+			<MetaCommand name="ST19_Enable" shortDescription="Enable the event-action function">
 				<BaseMetaCommand metaCommandRef="AcubeSATTC">
 					<ArgumentAssignmentList>
 						<ArgumentAssignment argumentName="ECSS_Service_Type" argumentValue="19" />
@@ -754,8 +738,7 @@ if (messageType.value == 1) {
 				</CommandContainer>
 				<DefaultSignificance consequenceLevel="distress" />
 			</MetaCommand>
-			<MetaCommand name="ST19_Disable">
-				<LongDescription>Disable the event-action function</LongDescription>
+			<MetaCommand name="ST19_Disable" shortDescription="Disable the event-action function">
 				<BaseMetaCommand metaCommandRef="AcubeSATTC">
 					<ArgumentAssignmentList>
 						<ArgumentAssignment argumentName="ECSS_Service_Type" argumentValue="19" />
