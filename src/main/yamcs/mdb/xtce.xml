@@ -498,6 +498,14 @@ if (messageType.value == 1) {
 				<UnitSet />
 				<IntegerDataEncoding sizeInBits="16" />
 			</IntegerArgumentType>
+			<IntegerArgumentType name="uint64_t" signed="false">
+				<UnitSet />
+				<IntegerDataEncoding sizeInBits="64" />
+			</IntegerArgumentType>
+			<FloatArgumentType name="float_t">
+				<UnitSet />
+				<FloatDataEncoding sizeInBits="32" />
+			</FloatArgumentType>
 			<IntegerArgumentType name="interval_ms_16" signed="false">
 				<UnitSet>
 					<Unit>milliseconds</Unit>
@@ -978,6 +986,62 @@ if (messageType.value == 1) {
 						<ArgumentRefEntry argumentRef="PMON_ID" />
 					</EntryList>
 					<BaseContainer containerRef="AcubeSATTC" />
+				</CommandContainer>
+				<DefaultSignificance consequenceLevel="warning" />
+			</MetaCommand>
+			<MetaCommand name="ST12_Add_Definition" abstract="true" shortDescription="Add a parameter monitoring definition">
+				<BaseMetaCommand metaCommandRef="AcubeSATTC">
+					<ArgumentAssignmentList>
+						<ArgumentAssignment argumentName="ECSS_Service_Type" argumentValue="12" />
+						<ArgumentAssignment argumentName="ECSS_Message_Type" argumentValue="5" />
+					</ArgumentAssignmentList>
+				</BaseMetaCommand>
+				<ArgumentList>
+					<Argument argumentTypeRef="uint16_t" name="PMON_ID" />
+					<Argument argumentTypeRef="uint16_t" name="Monitored_Parameter_ID" />
+					<Argument argumentTypeRef="uint16_t" name="Validity_Parameter_ID" />
+					<Argument argumentTypeRef="uint64_t" name="Validity_Mask" />
+					<Argument argumentTypeRef="uint64_t" name="Validity_Expected_Value" />
+					<Argument argumentTypeRef="interval_ms_16" name="Monitoring_Interval" />
+					<Argument argumentTypeRef="uint8_t" name="Repetition_Number" />
+					<Argument argumentTypeRef="uint8_t" name="Check_Type" />
+				</ArgumentList>
+				<CommandContainer name="ST12_Add_Definition">
+					<EntryList>
+						<FixedValueEntry name="N" binaryValue="01" sizeInBits="8" />
+						<ArgumentRefEntry argumentRef="PMON_ID" />
+						<ArgumentRefEntry argumentRef="Monitored_Parameter_ID" />
+						<ArgumentRefEntry argumentRef="Validity_Parameter_ID" />
+						<ArgumentRefEntry argumentRef="Validity_Mask" />
+						<ArgumentRefEntry argumentRef="Validity_Expected_Value" />
+						<ArgumentRefEntry argumentRef="Monitoring_Interval" />
+						<ArgumentRefEntry argumentRef="Repetition_Number" />
+						<ArgumentRefEntry argumentRef="Check_Type" />
+					</EntryList>
+					<BaseContainer containerRef="AcubeSATTC" />
+				</CommandContainer>
+				<DefaultSignificance consequenceLevel="warning" />
+			</MetaCommand>
+			<MetaCommand name="ST12_Add_Definition_Limit" shortDescription="Add a parameter monitoring definition: Limit check, float type">
+				<BaseMetaCommand metaCommandRef="ST12_Add_Definition">
+					<ArgumentAssignmentList>
+						<ArgumentAssignment argumentName="Check_Type" argumentValue="1" />
+					</ArgumentAssignmentList>
+				</BaseMetaCommand>
+				<ArgumentList>
+					<Argument argumentTypeRef="float_t" name="Low_Limit" />
+					<Argument argumentTypeRef="uint16_t" name="Low_Event" />
+					<Argument argumentTypeRef="float_t" name="High_Limit" />
+					<Argument argumentTypeRef="uint16_t" name="High_Event" />
+				</ArgumentList>
+				<CommandContainer name="ST12_Add_Definition_Limit">
+					<EntryList>
+						<ArgumentRefEntry argumentRef="Low_Limit" />
+						<ArgumentRefEntry argumentRef="Low_Event" />
+						<ArgumentRefEntry argumentRef="High_Limit" />
+						<ArgumentRefEntry argumentRef="High_Event" />
+					</EntryList>
+					<BaseContainer containerRef="ST12_Add_Definition" />
 				</CommandContainer>
 				<DefaultSignificance consequenceLevel="warning" />
 			</MetaCommand>
