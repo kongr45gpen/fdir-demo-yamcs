@@ -32,7 +32,8 @@ var parameterRequest = {
             { name: "/fdirdemo/PMON_Expected_Value_Check_uint64"},
             { name: "/fdirdemo/PMON_Expected_Value_Check_Temperature_Status"},
             { name: "/fdirdemo/EventAction_List" },
-            { name: "/fdirdemo/EventAction_Definition" }
+            { name: "/fdirdemo/EventAction_Definition" },
+            { name: "/fdirdemo/PMON_Check_Transition_List" },
         ]
     }
 }
@@ -49,11 +50,13 @@ websocket.onopen = function (event) {
 const $timestamp = document.getElementById('timestamp');
 const $pmonTable = document.getElementById('pmon-table');
 const $eventActionTable = document.getElementById('event-action-table');
+const $transitionTable = document.getElementById('check-transition-table');
 
 let pmons = {}
 let events = {};
+let transitions = [];
 
-getEventEnumeration = function() {
+getEnumerations = function() {
     var http = new XMLHttpRequest();
     http.addEventListener("load", function() {
         var json = JSON.parse(this.responseText);
@@ -63,15 +66,25 @@ getEventEnumeration = function() {
     })
     http.open("GET", "http://localhost:8090/api/mdb/fdirdemo/parameters/fdirdemo/Event_Definition_ID");
     http.send();
-}
-getEventEnumeration();
 
-getST12definitions = function() {
+    // var http2 = new XMLHttpRequest();
+    // http2.addEventListener("load", function() {
+    //     var json = JSON.parse(this.responseText);
+    //     for (var value of json.type.enumValue) {
+    //         EventEnumeration[parseInt(value.value)] = value.label;
+    //     }
+    // })
+    // http2.open("GET", "http://localhost:8090/api/mdb/fdirdemo/parameters/fdirdemo/Event_Definition_ID");
+    // http2.send();
+}
+getEnumerations();
+
+getST12definitions = _.throttle(function() {
     pmons = {};
     var http = new XMLHttpRequest();
     http.open("POST", "http://localhost:8090/api/processors/fdirdemo/realtime/commands/fdirdemo/ST12_ListAllDefinitions");
     http.send();
-}
+}, 200, { 'leading': false, 'trailing': true });
 
 getST19definitions = function() {
     events = {};
@@ -91,6 +104,18 @@ getST19requests = function() {
             ]
         }));
     }
+}
+
+colourStatus = function(element)  {
+    text = element.innerText.trim();
+    if (text == "Invalid") {
+        element.style.color = "#ff8f00";
+        element.style.fontWeight = 600;
+    } else if (text != "OK") {
+        element.style.color = "#c62828";
+        element.style.fontWeight = 600;
+    }
+    return element;
 }
 
 createPmonTable = _.throttle(function() {
@@ -122,13 +147,7 @@ createPmonTable = _.throttle(function() {
         tds[3].appendChild(document.createTextNode(pmon.monitoring_interval));
         tds[4].appendChild(document.createTextNode(pmon.status));
 
-        if (pmon.status == "Invalid") {
-            tds[4].style.color = "#ff8f00";
-            tds[4].style.fontWeight = "600";
-        } else if (pmon.status != "OK") {
-            tds[4].style.color = "#c62828";
-            tds[4].style.fontWeight = "600";
-        }
+        colourStatus(tds[4]);
 
         tds[5].appendChild(document.createTextNode(pmon.repetition_number));
 
@@ -225,6 +244,37 @@ createEventActionTable = _.throttle(function() {
     }
 }, 50, {'leading': false, 'trailing': true});
 
+createTransitionTable = _.throttle(function() {
+    $transitionTable.innerHTML = '';
+
+    for (const transition of _.reverse([...transitions])) {
+        var tr = document.createElement('tr');
+        var tds = _.map(new Array(5), function (e) { return document.createElement('td')});
+
+        tds[0].appendChild(document.createTextNode(transition.timestamp));
+        tds[1].appendChild(document.createTextNode(transition.pmonId));
+        tds[2].appendChild(document.createTextNode(transition.parameter));
+        tds[3].appendChild(document.createTextNode(transition.value));
+
+        tds[4].appendChild(document.createElement('span'));
+        tds[4].appendChild(document.createElement('i'));
+        tds[4].appendChild(document.createElement('span'));
+        tds[4].childNodes[0].appendChild(document.createTextNode(transition.previous));
+        colourStatus(tds[4].childNodes[0]);
+        tds[4].childNodes[1].appendChild(document.createTextNode('arrow_right_alt'));
+        tds[4].childNodes[1].classList.add('material-icons');
+        tds[4].childNodes[2].appendChild(document.createTextNode(transition.current));
+        colourStatus(tds[4].childNodes[2]);
+
+
+        for (const td of Object.values(tds)) {
+            tr.appendChild(td);
+        }
+        $transitionTable.appendChild(tr);
+    }
+}, 50, {'leading': false, 'trailing': true});
+
+
 findkey = function(array) {
     return function(key) {
         var index = _.findIndex(array.name, function(e) { return e == key })
@@ -243,6 +293,7 @@ websocket.onmessage = function (event) {
         var monitoringRaw = _.find(json.data.values, {'numericId': 1});
         var eventActionRaw = _.find(json.data.values, {'numericId': 6});
         var eventActionRequestRaw = _.find(json.data.values, {'numericId': 7});
+        var checkListRaw = _.find(json.data.values, {'numericId': 8});
 
         if (eventActionRaw) {
             var eventActionList = eventActionRaw.engValue.arrayValue;
@@ -273,10 +324,72 @@ websocket.onmessage = function (event) {
                 content1: text.substr(5, 16),
                 content2: text.substr(5 + 16, 16)
             }
+createEventActionTable = _.throttle(function() {
+    $eventActionTable.innerHTML = '';
+
+    for (const [eventActionID, eventAction] of Object.entries(events)) {
+        var tr = document.createElement('tr');
+        var tds = _.map(new Array(4), function (e) { return document.createElement('td')});
+
+        tds[0].appendChild(document.createTextNode(eventActionID));
+
+        tds[1].appendChild(document.createElement('span'));
+        tds[1].childNodes[0].classList.add('mdl-chip');
+        // tds[1].childNodes[0].classList.add('mdl-chip-long');
+        tds[1].childNodes[0].appendChild(document.createElement('span'));
+        tds[1].childNodes[0].childNodes[0].classList.add('mdl-chip__text');
+        tds[1].childNodes[0].childNodes[0].appendChild(document.createTextNode(eventAction.event))
+
+        if (eventAction.enabled) {
+            tds[2].appendChild(document.createTextNode("On"));
+            tds[2].classList.add('mdl-color-text--teal-300');
+        } else {
+            tds[2].appendChild(document.createTextNode("Off"));
+            tds[2].classList.add('mdl-color-text--red-300');
+        }
+
+        if (eventAction.request) {
+            tds[3].appendChild(document.createTextNode("TC[" + eventAction.request.service + "," + eventAction.request.message + "] "));
+            tds[3].appendChild(document.createElement('span'));
+            tds[3].childNodes[1].classList.add('mdl-typography--font-light');
+            tds[3].childNodes[1].appendChild(document.createTextNode(eventAction.request.content1 + " "));
+            tds[3].appendChild(document.createElement('span'));
+            tds[3].childNodes[2].classList.add('mdl-typography--font-light');
+            tds[3].childNodes[2].appendChild(document.createTextNode(eventAction.request.content2));
+        }
+
+        for (const td of Object.values(tds)) {
+            tr.appendChild(td);
+        }
+        $eventActionTable.appendChild(tr);
+    }
+}, 50, {'leading': false, 'trailing': true});
 
             events[id]["request"] = request;
 
             createEventActionTable();
+        }
+        if (checkListRaw) {
+            var checkList = checkListRaw.engValue.arrayValue;
+
+            for (var checkRaw of checkList) {
+                var check = findkey(checkRaw.aggregateValue);
+
+                var transition = {
+                    "pmonId": check("PMON_ID").uint32Value,
+                    "parameter": Parameters[check("Monitored_Parameter_ID").uint32Value],
+                    "check_type": check("Check_Type").uint32Value,
+                    "value": check("Value").floatValue,
+                    "previous": check("Previous_Check_Status").uint32Value,
+                    "current": check("Current_Check_Status").uint32Value,
+                    "timestamp": check("Timestamp").uint32Value
+                }
+
+                transitions.push(transition);
+            }
+
+            createTransitionTable();
+            getST12definitions();
         }
         if (monitoringRaw) {
             var checkRaw = _.find(json.data.values, function(e) { return e.numericId != 1 });
