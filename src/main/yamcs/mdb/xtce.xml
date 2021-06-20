@@ -819,6 +819,44 @@ if (messageType.value == 1) {
 				</CommandContainer>
 				<DefaultSignificance consequenceLevel="warning" />
 			</MetaCommand>
+			<MetaCommand name="ST12_Enable_Definition" shortDescription="Enable one on-board parameter monitoring definition">
+				<BaseMetaCommand metaCommandRef="AcubeSATTC">
+					<ArgumentAssignmentList>
+						<ArgumentAssignment argumentName="ECSS_Service_Type" argumentValue="12" />
+						<ArgumentAssignment argumentName="ECSS_Message_Type" argumentValue="1" />
+					</ArgumentAssignmentList>
+				</BaseMetaCommand>
+				<ArgumentList>
+					<Argument argumentTypeRef="uint16_t" name="PMON_ID" />
+				</ArgumentList>
+				<CommandContainer name="ST12_Enable_Definition">
+					<EntryList>
+						<FixedValueEntry name="N" binaryValue="01" sizeInBits="8" />
+						<ArgumentRefEntry argumentRef="PMON_ID" />
+					</EntryList>
+					<BaseContainer containerRef="AcubeSATTC" />
+				</CommandContainer>
+				<DefaultSignificance consequenceLevel="warning" />
+			</MetaCommand>
+			<MetaCommand name="ST12_Disable_Definition" shortDescription="Disable one on-board parameter monitoring definition">
+				<BaseMetaCommand metaCommandRef="AcubeSATTC">
+					<ArgumentAssignmentList>
+						<ArgumentAssignment argumentName="ECSS_Service_Type" argumentValue="12" />
+						<ArgumentAssignment argumentName="ECSS_Message_Type" argumentValue="2" />
+					</ArgumentAssignmentList>
+				</BaseMetaCommand>
+				<ArgumentList>
+					<Argument argumentTypeRef="uint16_t" name="PMON_ID" />
+				</ArgumentList>
+				<CommandContainer name="ST12_Disable_Definition">
+					<EntryList>
+						<FixedValueEntry name="N" binaryValue="01" sizeInBits="8" />
+						<ArgumentRefEntry argumentRef="PMON_ID" />
+					</EntryList>
+					<BaseContainer containerRef="AcubeSATTC" />
+				</CommandContainer>
+				<DefaultSignificance consequenceLevel="warning" />
+			</MetaCommand>
 		</MetaCommandSet>
 	</CommandMetaData>
 </SpaceSystem>
