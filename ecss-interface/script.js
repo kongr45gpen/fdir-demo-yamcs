@@ -44,8 +44,10 @@ var CheckStatusEnumeration = {}
 var websocket = new WebSocket("ws://localhost:8090/api/websocket")
 
 websocket.onopen = function (event) {
-    websocket.send(JSON.stringify(timeRequest));
-    websocket.send(JSON.stringify(parameterRequest));
+    setTimeout(function() {
+        websocket.send(JSON.stringify(timeRequest));
+        websocket.send(JSON.stringify(parameterRequest));
+    }, 300);
 }
 
 const $timestamp = document.getElementById('timestamp');
@@ -112,6 +114,11 @@ getST19requests = function() {
             ]
         }));
     }
+}
+
+clearTransitions = function() {
+    transitions = [];
+    createTransitionTable();
 }
 
 colourStatus = function(element)  {
