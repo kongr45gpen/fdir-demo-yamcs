@@ -2,6 +2,10 @@
 <SpaceSystem name="fdirdemo" xmlns="http://www.omg.org/space/xtce" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.omg.org/spec/XTCE/20180204 https://www.omg.org/spec/XTCE/20180204/SpaceSystem.xsd">
 	<TelemetryMetaData>
 		<ParameterTypeSet>
+			<BooleanParameterType name="bool8_t">
+				<UnitSet />
+				<IntegerDataEncoding sizeInBits="8" />
+			</BooleanParameterType>
 			<IntegerParameterType name="uint8_t" signed="false">
 				<UnitSet />
 				<IntegerDataEncoding sizeInBits="8" />
@@ -117,7 +121,6 @@
 				</EnumerationList>
 			</EnumeratedParameterType>
 			<AggregateParameterType name="PMON_Definition_Type">
-				<UnitSet />
 				<MemberList>
 					<Member name="PMON_ID" typeRef="uint16_t" />
 					<Member name="Monitored_Parameter_ID" typeRef="uint16_t" />
@@ -131,7 +134,6 @@
 				</MemberList>
 			</AggregateParameterType>
 			<AggregateParameterType name="PMON_Expected_Value_Check_uint64_Type">
-				<UnitSet />
 				<MemberList>
 					<Member name="Mask" typeRef="uint64_t" />
 					<Member name="Expected_Value" typeRef="uint64_t" />
@@ -139,7 +141,6 @@
 				</MemberList>
 			</AggregateParameterType>
 			<AggregateParameterType name="PMON_Expected_Value_Check_Temperature_Status_Type">
-				<UnitSet />
 				<MemberList>
 					<Member name="Mask" typeRef="uint64_t" />
 					<Member name="Expected_Value" typeRef="Temperature_Status_Type" />
@@ -147,7 +148,6 @@
 				</MemberList>
 			</AggregateParameterType>
 			<AggregateParameterType name="PMON_Limit_Check_Float_Type">
-				<UnitSet />
 				<MemberList>
 					<Member name="Low_Limit" typeRef="float_t" />
 					<Member name="Low_Event" typeRef="Event_Definition_ID_Type" />
@@ -156,7 +156,6 @@
 				</MemberList>
 			</AggregateParameterType>
 			<AggregateParameterType name="PMON_Limit_Check_Double_Type">
-				<UnitSet />
 				<MemberList>
 					<Member name="Low_Limit" typeRef="double_t" />
 					<Member name="Low_Event" typeRef="Event_Definition_ID_Type" />
@@ -164,6 +163,29 @@
 					<Member name="High_Event" typeRef="Event_Definition_ID_Type" />
 				</MemberList>
 			</AggregateParameterType>
+			<AggregateParameterType name="EventAction_Definition_Type">
+				<MemberList>
+					<Member name="APID" typeRef="uint16_t" />
+					<Member name="Event_Definition_ID" typeRef="Event_Definition_ID_Type" />
+					<Member name="EventAction_Definition_ID" typeRef="uint16_t" />
+					<Member name="Enabled" typeRef="bool8_t" />
+				</MemberList>
+			</AggregateParameterType>s
+			<ArrayParameterType name="EventAction_List_Type" arrayTypeRef="EventAction_Definition_Type" numberOfDimensions="1">
+				<DimensionList>
+					<Dimension>
+						<StartingIndex>
+							<FixedValue>0</FixedValue>
+						</StartingIndex>
+						<EndingIndex>
+							<DynamicValue>
+								<ParameterInstanceRef parameterRef="EventAction_Count" />
+								<LinearAdjustment intercept="-1" />
+							</DynamicValue>
+						</EndingIndex>
+					</Dimension>
+				</DimensionList>
+			</ArrayParameterType>
 		</ParameterTypeSet>
 		<ParameterSet>
 			<Parameter name="ECSS_Version" parameterTypeRef="uint8_t" />
@@ -189,6 +211,8 @@
 			<Parameter name="PMON_Expected_Value_Check_Temperature_Status" parameterTypeRef="PMON_Expected_Value_Check_Temperature_Status_Type" />
 			<Parameter name="PMON_Limit_Check_Float" parameterTypeRef="PMON_Limit_Check_Float_Type" />
 			<Parameter name="PMON_Limit_Check_Double" parameterTypeRef="PMON_Limit_Check_Double_Type" />
+			<Parameter name="EventAction_Count" parameterTypeRef="uint16_t" />
+			<Parameter name="EventAction_List" parameterTypeRef="EventAction_List_Type" />
 		</ParameterSet>
 		<AlgorithmSet>
 			<CustomAlgorithm name="EventTranscriberAlgorithm">
@@ -333,6 +357,34 @@ if (messageType.value == 1) {
 						<ComparisonList>
 							<Comparison value="1" parameterRef="PMON_Monitoring_Definition_Count" />
 							<Comparison value="Limit_Check" parameterRef="PMON_Monitoring_Definition.Check_Type" />
+						</ComparisonList>
+					</RestrictionCriteria>
+				</BaseContainer>
+			</SequenceContainer>
+			<SequenceContainer name="EventAction_List">
+				<EntryList>
+					<ParameterRefEntry parameterRef="EventAction_Count" />
+					<ArrayParameterRefEntry parameterRef="EventAction_List">
+						<DimensionList>
+							<Dimension>
+								<StartingIndex>
+									<FixedValue>0</FixedValue>
+								</StartingIndex>
+								<EndingIndex>
+									<DynamicValue>
+										<ParameterInstanceRef parameterRef="EventAction_Count" />
+										<LinearAdjustment intercept="-1" />
+									</DynamicValue>
+								</EndingIndex>
+							</Dimension>
+						</DimensionList>
+					</ArrayParameterRefEntry>
+				</EntryList>
+				<BaseContainer containerRef="ECSSTM">
+					<RestrictionCriteria>
+						<ComparisonList>
+							<Comparison value="19" parameterRef="ECSS_Service_Type" />
+							<Comparison value="7" parameterRef="ECSS_Message_Type" />
 						</ComparisonList>
 					</RestrictionCriteria>
 				</BaseContainer>
@@ -597,7 +649,7 @@ if (messageType.value == 1) {
 					<EntryList />
 					<BaseContainer containerRef="AcubeSATTC" />
 				</CommandContainer>
-				<DefaultSignificance consequenceLevel="warning" />
+				<DefaultSignificance consequenceLevel="distress" />
 			</MetaCommand>
 			<MetaCommand name="OnBoardMonitoring_Disable">
 				<LongDescription>Disable the entire on-board monitoring function</LongDescription>
@@ -611,7 +663,7 @@ if (messageType.value == 1) {
 					<EntryList />
 					<BaseContainer containerRef="AcubeSATTC" />
 				</CommandContainer>
-				<DefaultSignificance consequenceLevel="warning" />
+				<DefaultSignificance consequenceLevel="distress" />
 			</MetaCommand>
 			<MetaCommand name="ST20_SetOne" abstract="true">
 				<LongDescription>Set one on-board parameter</LongDescription>
@@ -673,6 +725,48 @@ if (messageType.value == 1) {
 					<BaseContainer containerRef="AcubeSATTC" />
 				</CommandContainer>
 				<DefaultSignificance consequenceLevel="none" />
+			</MetaCommand>
+			<MetaCommand name="ST19_ListAllEventAction">
+				<LongDescription>Report the list of all event-action definitions</LongDescription>
+				<BaseMetaCommand metaCommandRef="AcubeSATTC">
+					<ArgumentAssignmentList>
+						<ArgumentAssignment argumentName="ECSS_Service_Type" argumentValue="19" />
+						<ArgumentAssignment argumentName="ECSS_Message_Type" argumentValue="6" />
+					</ArgumentAssignmentList>
+				</BaseMetaCommand>
+				<CommandContainer name="ST19_ListAllEventAction">
+					<EntryList />
+					<BaseContainer containerRef="AcubeSATTC" />
+				</CommandContainer>
+				<DefaultSignificance consequenceLevel="none" />
+			</MetaCommand>
+			<MetaCommand name="ST19_Enable">
+				<LongDescription>Enable the event-action function</LongDescription>
+				<BaseMetaCommand metaCommandRef="AcubeSATTC">
+					<ArgumentAssignmentList>
+						<ArgumentAssignment argumentName="ECSS_Service_Type" argumentValue="19" />
+						<ArgumentAssignment argumentName="ECSS_Message_Type" argumentValue="8" />
+					</ArgumentAssignmentList>
+				</BaseMetaCommand>
+				<CommandContainer name="ST19_Enable">
+					<EntryList />
+					<BaseContainer containerRef="AcubeSATTC" />
+				</CommandContainer>
+				<DefaultSignificance consequenceLevel="distress" />
+			</MetaCommand>
+			<MetaCommand name="ST19_Disable">
+				<LongDescription>Disable the event-action function</LongDescription>
+				<BaseMetaCommand metaCommandRef="AcubeSATTC">
+					<ArgumentAssignmentList>
+						<ArgumentAssignment argumentName="ECSS_Service_Type" argumentValue="19" />
+						<ArgumentAssignment argumentName="ECSS_Message_Type" argumentValue="9" />
+					</ArgumentAssignmentList>
+				</BaseMetaCommand>
+				<CommandContainer name="ST19_Disable">
+					<EntryList />
+					<BaseContainer containerRef="AcubeSATTC" />
+				</CommandContainer>
+				<DefaultSignificance consequenceLevel="distress" />
 			</MetaCommand>
 		</MetaCommandSet>
 	</CommandMetaData>
