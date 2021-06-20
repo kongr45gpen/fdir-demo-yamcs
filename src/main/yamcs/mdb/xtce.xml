@@ -205,6 +205,32 @@
 					</Dimension>
 				</DimensionList>
 			</ArrayParameterType>
+			<AggregateParameterType name="PMON_Check_Transition_Type">
+				<MemberList>
+					<Member name="PMON_ID" typeRef="uint16_t" />
+					<Member name="Monitored_Parameter_ID" typeRef="uint16_t" />
+					<Member name="Check_Type" typeRef="PMON_Definition_Check_ID_Type" />
+					<Member name="Value" typeRef="float_t" />
+					<Member name="Previous_Check_Status" typeRef="PMON_Check_Status_Type" />
+					<Member name="Current_Check_Status" typeRef="PMON_Check_Status_Type" />
+					<Member name="Timestamp" typeRef="uint32_t" />
+				</MemberList>
+			</AggregateParameterType>
+			<ArrayParameterType name="PMON_Check_Transition_List_Type" arrayTypeRef="PMON_Check_Transition_Type" numberOfDimensions="1">
+				<DimensionList>
+					<Dimension>
+						<StartingIndex>
+							<FixedValue>0</FixedValue>
+						</StartingIndex>
+						<EndingIndex>
+							<DynamicValue>
+								<ParameterInstanceRef parameterRef="PMON_Check_Transition_Count" />
+								<LinearAdjustment intercept="-1" />
+							</DynamicValue>
+						</EndingIndex>
+					</Dimension>
+				</DimensionList>
+			</ArrayParameterType>
 		</ParameterTypeSet>
 		<ParameterSet>
 			<Parameter name="ECSS_Version" parameterTypeRef="uint8_t" />
@@ -230,6 +256,8 @@
 			<Parameter name="PMON_Expected_Value_Check_Temperature_Status" parameterTypeRef="PMON_Expected_Value_Check_Temperature_Status_Type" />
 			<Parameter name="PMON_Limit_Check_Float" parameterTypeRef="PMON_Limit_Check_Float_Type" />
 			<Parameter name="PMON_Limit_Check_Double" parameterTypeRef="PMON_Limit_Check_Double_Type" />
+			<Parameter name="PMON_Check_Transition_Count" parameterTypeRef="uint8_t" />
+			<Parameter name="PMON_Check_Transition_List" parameterTypeRef="PMON_Check_Transition_List_Type" />
 			<Parameter name="EventAction_Count" parameterTypeRef="uint16_t" />
 			<Parameter name="EventAction_List" parameterTypeRef="EventAction_List_Type" />
 			<Parameter name="EventAction_Definition" parameterTypeRef="EventAction_Definition_Type" />
@@ -377,6 +405,34 @@ if (messageType.value == 1) {
 						<ComparisonList>
 							<Comparison value="1" parameterRef="PMON_Monitoring_Definition_Count" />
 							<Comparison value="Limit_Check" parameterRef="PMON_Monitoring_Definition.Check_Type" />
+						</ComparisonList>
+					</RestrictionCriteria>
+				</BaseContainer>
+			</SequenceContainer>
+			<SequenceContainer name="PMON_Check_Transition_Report">
+				<EntryList>
+					<ParameterRefEntry parameterRef="PMON_Check_Transition_Count" />
+					<ArrayParameterRefEntry parameterRef="PMON_Check_Transition_List">
+						<DimensionList>
+							<Dimension>
+								<StartingIndex>
+									<FixedValue>0</FixedValue>
+								</StartingIndex>
+								<EndingIndex>
+									<DynamicValue>
+										<ParameterInstanceRef parameterRef="PMON_Check_Transition_Count" />
+										<LinearAdjustment intercept="-1" />
+									</DynamicValue>
+								</EndingIndex>
+							</Dimension>
+						</DimensionList>
+					</ArrayParameterRefEntry>
+				</EntryList>
+				<BaseContainer containerRef="ECSSTM">
+					<RestrictionCriteria>
+						<ComparisonList>
+							<Comparison value="12" parameterRef="ECSS_Service_Type" />
+							<Comparison value="12" parameterRef="ECSS_Message_Type" />
 						</ComparisonList>
 					</RestrictionCriteria>
 				</BaseContainer>
