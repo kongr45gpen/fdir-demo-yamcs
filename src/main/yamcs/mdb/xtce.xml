@@ -183,8 +183,8 @@
 			<Parameter name="Verification_APID" parameterTypeRef="APID_Type" />
 			<Parameter name="Verification_Packet_Sequence_Count" parameterTypeRef="Packet_Sequence_Count_Type" />
 			<Parameter name="Verification_Code" parameterTypeRef="uint16_t" />
-			<Parameter name="Monitoring_Definition_Count" parameterTypeRef="uint8_t" />
-			<Parameter name="Monitoring_Definition" parameterTypeRef="PMON_Definition_Type" />
+			<Parameter name="PMON_Monitoring_Definition_Count" parameterTypeRef="uint8_t" />
+			<Parameter name="PMON_Monitoring_Definition" parameterTypeRef="PMON_Definition_Type" />
 			<Parameter name="PMON_Expected_Value_Check_uint64" parameterTypeRef="PMON_Expected_Value_Check_uint64_Type" />
 			<Parameter name="PMON_Expected_Value_Check_Temperature_Status" parameterTypeRef="PMON_Expected_Value_Check_Temperature_Status_Type" />
 			<Parameter name="PMON_Limit_Check_Float" parameterTypeRef="PMON_Limit_Check_Float_Type" />
@@ -297,8 +297,8 @@ if (messageType.value == 1) {
 			</SequenceContainer>
 			<SequenceContainer name="MonitoringDefinitions">
 				<EntryList>
-					<ParameterRefEntry parameterRef="Monitoring_Definition_Count" />
-					<ParameterRefEntry parameterRef="Monitoring_Definition" />
+					<ParameterRefEntry parameterRef="PMON_Monitoring_Definition_Count" />
+					<ParameterRefEntry parameterRef="PMON_Monitoring_Definition" />
 				</EntryList>
 				<BaseContainer containerRef="ECSSTM">
 					<RestrictionCriteria>
@@ -316,10 +316,10 @@ if (messageType.value == 1) {
 				<BaseContainer containerRef="MonitoringDefinitions">
 					<RestrictionCriteria>
 						<ComparisonList>
-							<Comparison value="1" parameterRef="Monitoring_Definition_Count" />
-							<Comparison value="Expected_Value_Check" parameterRef="Monitoring_Definition.Check_Type" />
-							<Comparison comparisonOperator="&gt;=" value="3" parameterRef="Monitoring_Definition.Monitored_Parameter_ID" />
-							<Comparison comparisonOperator="&lt;=" value="5" parameterRef="Monitoring_Definition.Monitored_Parameter_ID" />
+							<Comparison value="1" parameterRef="PMON_Monitoring_Definition_Count" />
+							<Comparison value="Expected_Value_Check" parameterRef="PMON_Monitoring_Definition.Check_Type" />
+							<Comparison comparisonOperator="&gt;=" value="3" parameterRef="PMON_Monitoring_Definition.Monitored_Parameter_ID" />
+							<Comparison comparisonOperator="&lt;=" value="5" parameterRef="PMON_Monitoring_Definition.Monitored_Parameter_ID" />
 						</ComparisonList>
 					</RestrictionCriteria>
 				</BaseContainer>
@@ -331,8 +331,8 @@ if (messageType.value == 1) {
 				<BaseContainer containerRef="MonitoringDefinitions">
 					<RestrictionCriteria>
 						<ComparisonList>
-							<Comparison value="1" parameterRef="Monitoring_Definition_Count" />
-							<Comparison value="Limit_Check" parameterRef="Monitoring_Definition.Check_Type" />
+							<Comparison value="1" parameterRef="PMON_Monitoring_Definition_Count" />
+							<Comparison value="Limit_Check" parameterRef="PMON_Monitoring_Definition.Check_Type" />
 						</ComparisonList>
 					</RestrictionCriteria>
 				</BaseContainer>
@@ -527,7 +527,7 @@ if (messageType.value == 1) {
 				<LongDescription>Run an ST[08] on-board function</LongDescription>
 				<ArgumentList>
 					<Argument argumentTypeRef="ECSS_Function_Name_Type" name="ECSS_Function_Name" shortDescription="Function definition name" />
-					<Argument argumentTypeRef="ECSS_Function_Data_Type" name="ECSS_Function_Data" shortDescription="Auxiliary data to include" initialValue="\u000" />
+					<Argument argumentTypeRef="ECSS_Function_Data_Type" name="ECSS_Function_Data" shortDescription="Auxiliary data to include" initialValue="0" />
 				</ArgumentList>
 				<BaseMetaCommand metaCommandRef="AcubeSATTC">
 					<ArgumentAssignmentList>
@@ -556,6 +556,34 @@ if (messageType.value == 1) {
 					<BaseContainer containerRef="ST08_Function" />
 				</CommandContainer>
 				<DefaultSignificance consequenceLevel="warning" />
+			</MetaCommand>
+			<MetaCommand name="Sensor1_Restart">
+				<LongDescription>Restart Sensor 1</LongDescription>
+				<BaseMetaCommand metaCommandRef="ST08_Function">
+					<ArgumentAssignmentList>
+						<ArgumentAssignment argumentName="ECSS_Function_Name" argumentValue="restart_sensor" />
+						<ArgumentAssignment argumentName="ECSS_Function_Data" argumentValue="1" />
+					</ArgumentAssignmentList>
+				</BaseMetaCommand>
+				<CommandContainer name="Sensor1_Restart">
+					<EntryList />
+					<BaseContainer containerRef="ST08_Function" />
+				</CommandContainer>
+				<DefaultSignificance consequenceLevel="watch" />
+			</MetaCommand>
+			<MetaCommand name="Sensor2_Restart">
+				<LongDescription>Restart Sensor 2</LongDescription>
+				<BaseMetaCommand metaCommandRef="ST08_Function">
+					<ArgumentAssignmentList>
+						<ArgumentAssignment argumentName="ECSS_Function_Name" argumentValue="restart_sensor" />
+						<ArgumentAssignment argumentName="ECSS_Function_Data" argumentValue="2" />
+					</ArgumentAssignmentList>
+				</BaseMetaCommand>
+				<CommandContainer name="Sensor2_Restart">
+					<EntryList />
+					<BaseContainer containerRef="ST08_Function" />
+				</CommandContainer>
+				<DefaultSignificance consequenceLevel="watch" />
 			</MetaCommand>
 			<MetaCommand name="OnBoardMonitoring_Enable">
 				<LongDescription>Enable the entire on-board monitoring function</LongDescription>
