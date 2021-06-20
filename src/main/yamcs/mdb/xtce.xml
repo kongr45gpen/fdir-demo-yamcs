@@ -163,15 +163,34 @@
 					<Member name="High_Event" typeRef="Event_Definition_ID_Type" />
 				</MemberList>
 			</AggregateParameterType>
+			<StringParameterType name="TC_Request_Type">
+				<UnitSet />
+				<StringDataEncoding>
+					<SizeInBits>
+						<Fixed>
+							<FixedValue>512</FixedValue>
+						</Fixed>
+					</SizeInBits>
+				</StringDataEncoding>
+			</StringParameterType>
 			<AggregateParameterType name="EventAction_Definition_Type">
 				<MemberList>
 					<Member name="APID" typeRef="uint16_t" />
 					<Member name="Event_Definition_ID" typeRef="Event_Definition_ID_Type" />
 					<Member name="EventAction_Definition_ID" typeRef="uint16_t" />
 					<Member name="Enabled" typeRef="bool8_t" />
+					<Member name="TC" typeRef="TC_Request_Type" />
 				</MemberList>
-			</AggregateParameterType>s
-			<ArrayParameterType name="EventAction_List_Type" arrayTypeRef="EventAction_Definition_Type" numberOfDimensions="1">
+			</AggregateParameterType>
+			<AggregateParameterType name="EventAction_Status_Type">
+				<MemberList>
+					<Member name="APID" typeRef="uint16_t" />
+					<Member name="Event_Definition_ID" typeRef="Event_Definition_ID_Type" />
+					<Member name="EventAction_Definition_ID" typeRef="uint16_t" />
+					<Member name="Enabled" typeRef="bool8_t" />
+				</MemberList>
+			</AggregateParameterType>
+			<ArrayParameterType name="EventAction_List_Type" arrayTypeRef="EventAction_Status_Type" numberOfDimensions="1">
 				<DimensionList>
 					<Dimension>
 						<StartingIndex>
@@ -213,6 +232,7 @@
 			<Parameter name="PMON_Limit_Check_Double" parameterTypeRef="PMON_Limit_Check_Double_Type" />
 			<Parameter name="EventAction_Count" parameterTypeRef="uint16_t" />
 			<Parameter name="EventAction_List" parameterTypeRef="EventAction_List_Type" />
+			<Parameter name="EventAction_Definition" parameterTypeRef="EventAction_Definition_Type" />
 		</ParameterSet>
 		<AlgorithmSet>
 			<CustomAlgorithm name="EventTranscriberAlgorithm">
@@ -385,6 +405,23 @@ if (messageType.value == 1) {
 						<ComparisonList>
 							<Comparison value="19" parameterRef="ECSS_Service_Type" />
 							<Comparison value="7" parameterRef="ECSS_Message_Type" />
+						</ComparisonList>
+					</RestrictionCriteria>
+				</BaseContainer>
+			</SequenceContainer>
+			<SequenceContainer name="EventAction_Request_List">
+				<EntryList>
+					<ParameterRefEntry parameterRef="EventAction_Definition">
+						<LocationInContainerInBits referenceLocation="previousEntry">
+							<FixedValue>8</FixedValue>
+						</LocationInContainerInBits>
+					</ParameterRefEntry>
+				</EntryList>
+				<BaseContainer containerRef="ECSSTM">
+					<RestrictionCriteria>
+						<ComparisonList>
+							<Comparison value="19" parameterRef="ECSS_Service_Type" />
+							<Comparison value="11" parameterRef="ECSS_Message_Type" />
 						</ComparisonList>
 					</RestrictionCriteria>
 				</BaseContainer>
@@ -617,6 +654,18 @@ if (messageType.value == 1) {
 				</CommandContainer>
 				<DefaultSignificance consequenceLevel="none" />
 			</MetaCommand>
+			<MetaCommand name="Log" shortDescription="Output a string via UART">
+				<BaseMetaCommand metaCommandRef="ST08_Function">
+					<ArgumentAssignmentList>
+						<ArgumentAssignment argumentName="ECSS_Function_Name" argumentValue="log" />
+					</ArgumentAssignmentList>
+				</BaseMetaCommand>
+				<CommandContainer name="Log">
+					<EntryList />
+					<BaseContainer containerRef="ST08_Function" />
+				</CommandContainer>
+				<DefaultSignificance consequenceLevel="none" />
+			</MetaCommand>
 			<MetaCommand name="MCU_Reset" shortDescription="Perform a soft reset of the MCU">
 				<BaseMetaCommand metaCommandRef="ST08_Function">
 					<ArgumentAssignmentList>
@@ -763,6 +812,25 @@ if (messageType.value == 1) {
 					<BaseContainer containerRef="AcubeSATTC" />
 				</CommandContainer>
 				<DefaultSignificance consequenceLevel="distress" />
+			</MetaCommand>
+			<MetaCommand name="ST19_ListEventActionRequest" shortDescription="Show an event-action definition with TC requests">
+				<BaseMetaCommand metaCommandRef="AcubeSATTC">
+					<ArgumentAssignmentList>
+						<ArgumentAssignment argumentName="ECSS_Service_Type" argumentValue="19" />
+						<ArgumentAssignment argumentName="ECSS_Message_Type" argumentValue="10" />
+					</ArgumentAssignmentList>
+				</BaseMetaCommand>
+				<ArgumentList>
+					<Argument argumentTypeRef="uint16_t" name="Event_Action_Definition_ID" />
+				</ArgumentList>
+				<CommandContainer name="ST19_ListEventActionRequest">
+					<EntryList>
+						<FixedValueEntry name="N" binaryValue="01" sizeInBits="8" />
+						<ArgumentRefEntry argumentRef="Event_Action_Definition_ID" />
+					</EntryList>
+					<BaseContainer containerRef="AcubeSATTC" />
+				</CommandContainer>
+				<DefaultSignificance consequenceLevel="none" />
 			</MetaCommand>
 			<MetaCommand name="ST19_Disable" shortDescription="Disable the event-action function">
 				<BaseMetaCommand metaCommandRef="AcubeSATTC">
