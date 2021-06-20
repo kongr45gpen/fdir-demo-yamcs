@@ -31,9 +31,12 @@ var parameterRequest = {
             { name: "/fdirdemo/PMON_Limit_Check_Float"},
             { name: "/fdirdemo/PMON_Expected_Value_Check_uint64"},
             { name: "/fdirdemo/PMON_Expected_Value_Check_Temperature_Status"},
+            { name: "/fdirdemo/EventAction_List" }
         ]
     }
 }
+
+var EventEnumeration = {}
 
 var websocket = new WebSocket("ws://localhost:8090/api/websocket")
 
@@ -44,13 +47,35 @@ websocket.onopen = function (event) {
 
 const $timestamp = document.getElementById('timestamp');
 const $pmonTable = document.getElementById('pmon-table');
+const $eventActionTable = document.getElementById('event-action-table');
 
 let pmons = {}
+let events = {};
 
-receiveST12definitions = function() {
+getEventEnumeration = function() {
+    var http = new XMLHttpRequest();
+    http.addEventListener("load", function() {
+        var json = JSON.parse(this.responseText);
+        for (var value of json.type.enumValue) {
+            EventEnumeration[parseInt(value.value)] = value.label;
+        }
+    })
+    http.open("GET", "http://localhost:8090/api/mdb/fdirdemo/parameters/fdirdemo/Event_Definition_ID");
+    http.send();
+}
+getEventEnumeration();
+
+getST12definitions = function() {
     pmons = {};
     var http = new XMLHttpRequest();
     http.open("POST", "http://localhost:8090/api/processors/fdirdemo/realtime/commands/fdirdemo/ST12_ListAllDefinitions");
+    http.send();
+}
+
+getST19definitions = function() {
+    events = {};
+    var http = new XMLHttpRequest();
+    http.open("POST", "http://localhost:8090/api/processors/fdirdemo/realtime/commands/fdirdemo/ST19_ListAllEventAction");
     http.send();
 }
 
@@ -145,6 +170,45 @@ createPmonTable = _.throttle(function() {
     }
 }, 50, {'leading': false, 'trailing': true});
 
+createEventActionTable = _.throttle(function() {
+    $eventActionTable.innerHTML = '';
+
+    for (const [eventActionID, eventAction] of Object.entries(events)) {
+        var tr = document.createElement('tr');
+        var tds = _.map(new Array(3), function (e) { return document.createElement('td')});
+
+        tds[0].appendChild(document.createTextNode(eventActionID));
+
+        tds[1].appendChild(document.createElement('span'));
+        tds[1].childNodes[0].classList.add('mdl-chip');
+        // tds[1].childNodes[0].classList.add('mdl-chip-long');
+        tds[1].childNodes[0].appendChild(document.createElement('span'));
+        tds[1].childNodes[0].childNodes[0].classList.add('mdl-chip__text');
+        tds[1].childNodes[0].childNodes[0].appendChild(document.createTextNode(eventAction.event))
+
+        if (eventAction.enabled) {
+            tds[2].appendChild(document.createTextNode("On"));
+            tds[2].classList.add('mdl-color-text--teal-300');
+        } else {
+            tds[2].appendChild(document.createTextNode("Off"));
+            tds[2].classList.add('mdl-color-text--red-300');
+        }
+
+        for (const td of Object.values(tds)) {
+            tr.appendChild(td);
+        }
+        $eventActionTable.appendChild(tr);
+    }
+}, 50, {'leading': false, 'trailing': true});
+
+findkey = function(array) {
+    return function(key) {
+        var index = _.findIndex(array.name, function(e) { return e == key })
+
+        return array.value[index];
+    }
+}
+
 websocket.onmessage = function (event) {
     var json = JSON.parse(event.data);
     console.log(json);
@@ -152,51 +216,62 @@ websocket.onmessage = function (event) {
     if (json.type == "time") {
         $timestamp.innerText = json.data.value;
     } else if (json.type == "parameters") {
-        var monitoringRaw = _.find(json.data.values, {'numericId': 1});
-        var checkRaw = _.find(json.data.values, function(e) { return e.numericId != 1 });
+        var eventActionRaw = _.find(json.data.values, {'numericId': 6});
 
-        monitoring = function(key) {
-            var index = _.findIndex(monitoringRaw.engValue.aggregateValue.name, function(e) { return e == key })
+        if (eventActionRaw) {
+            var eventActionList = eventActionRaw.engValue.arrayValue;
 
-            return monitoringRaw.engValue.aggregateValue.value[index];
-        }
+            for (var definitionRaw of eventActionList) {
+                var eventaction = findkey(definitionRaw.aggregateValue);
 
-        check = function(key) {
-            var index = _.findIndex(checkRaw.engValue.aggregateValue.name, function(e) { return e == key })
+                var entry = {
+                    "event": EventEnumeration[eventaction("Event_Definition_ID").uint32Value],
+                    "ID": eventaction("EventAction_Definition_ID").uint32Value,
+                    "enabled": eventaction("Enabled").uint32Value
+                }
 
-            return checkRaw.engValue.aggregateValue.value[index];
-        }
-
-        if (check("Mask") !== undefined) {
-            checkData = {
-                "mask": "0x" + check("Mask").uint32Value.toString(16),
-                "value": check("Expected_Value").stringValue ? check("Expected_Value").stringValue : check("Expected_Value").uint32Value,
-                "event": check("Event_Definition_ID").stringValue
+                events[entry["ID"]] = entry;
             }
+
+            createEventActionTable();
         } else {
-            checkData = {
-                "low": check("Low_Limit").floatValue,
-                "low_event": check("Low_Event").stringValue,
-                "high": check("High_Limit").floatValue,
-                "high_event": check("High_Event").stringValue
+            var monitoringRaw = _.find(json.data.values, {'numericId': 1});
+            var checkRaw = _.find(json.data.values, function(e) { return e.numericId != 1 });
+
+            monitoring = findkey(monitoringRaw.engValue.aggregateValue);
+            check = findkey(checkRaw.engValue.aggregateValue);
+
+            if (check("Mask") !== undefined) {
+                checkData = {
+                    "mask": "0x" + check("Mask").uint32Value.toString(16),
+                    "value": check("Expected_Value").stringValue ? check("Expected_Value").stringValue : check("Expected_Value").uint32Value,
+                    "event": check("Event_Definition_ID").stringValue
+                }
+            } else {
+                checkData = {
+                    "low": check("Low_Limit").floatValue,
+                    "low_event": check("Low_Event").stringValue,
+                    "high": check("High_Limit").floatValue,
+                    "high_event": check("High_Event").stringValue
+                }
             }
-        }
 
-        pmons[monitoring("PMON_ID").uint32Value] = {
-            "parameter": Parameters[monitoring("Monitored_Parameter_ID").uint32Value],
-            "validity": Parameters[monitoring("Mask").uint32Value] == 0 ? null : {
-                "parameter": Parameters[monitoring("Validity_Parameter_ID").uint32Value],
-                "mask": "0x" + monitoring("Mask").uint32Value.toString(16),
-                "value": monitoring("Expected_Value").uint32Value,
-            },
-            "monitoring_interval": monitoring("Monitoring_Interval").uint32Value + " ms",
-            "status": monitoring("Check_Status").stringValue,
-            "repetition_number": monitoring("Repetition_Number").uint32Value,
-            "check": checkData,
-            "check_type": monitoring("Check_Type").stringValue,
-            "date": monitoringRaw.generationTime
-        }
+            pmons[monitoring("PMON_ID").uint32Value] = {
+                "parameter": Parameters[monitoring("Monitored_Parameter_ID").uint32Value],
+                "validity": Parameters[monitoring("Mask").uint32Value] == 0 ? null : {
+                    "parameter": Parameters[monitoring("Validity_Parameter_ID").uint32Value],
+                    "mask": "0x" + monitoring("Mask").uint32Value.toString(16),
+                    "value": monitoring("Expected_Value").uint32Value,
+                },
+                "monitoring_interval": monitoring("Monitoring_Interval").uint32Value + " ms",
+                "status": monitoring("Check_Status").stringValue,
+                "repetition_number": monitoring("Repetition_Number").uint32Value,
+                "check": checkData,
+                "check_type": monitoring("Check_Type").stringValue,
+                "date": monitoringRaw.generationTime
+            }
 
-        createPmonTable();
+            createPmonTable();
+        }
     }
 }
