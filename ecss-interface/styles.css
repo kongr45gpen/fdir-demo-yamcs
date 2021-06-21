@@ -234,3 +234,15 @@ _:-ms-input-placeholder, :root .demo-graph {
   padding: 6px 9px;
   height: 32px;
 }
+.demo-content > .mdl-data-table {
+  align-self: flex-start;
+}
+.demo-check-tr > * {
+  width: 100%;
+}
+.demo-check-tr {
+  padding: 0px;
+  border-top: none !important;
+  max-height: 70vh;
+  overflow-y: auto;
+}
