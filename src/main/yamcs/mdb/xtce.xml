@@ -578,6 +578,16 @@ if (messageType.value == 1) {
 					</SizeInBits>
 				</StringDataEncoding>
 			</StringArgumentType>
+			<BinaryArgumentType name="TC_Request_Type">
+				<UnitSet />
+				<BinaryDataEncoding>
+					<SizeInBits>
+						<Fixed>
+							<FixedValue>512</FixedValue>
+						</Fixed>
+					</SizeInBits>
+				</BinaryDataEncoding>
+			</BinaryArgumentType>
 			<EnumeratedArgumentType name="Temperature_Status_Type">
 				<UnitSet />
 				<IntegerDataEncoding sizeInBits="8"/>
@@ -959,6 +969,53 @@ if (messageType.value == 1) {
 						<FixedValueEntry name="APID" binaryValue="0000" sizeInBits="16" />
 						<ArgumentRefEntry argumentRef="Event_Definition_ID" />
 						<FixedValueEntry name="Event_Action_Definition_ID" binaryValue="0000" sizeInBits="16" />
+					</EntryList>
+					<BaseContainer containerRef="AcubeSATTC" />
+				</CommandContainer>
+				<DefaultSignificance consequenceLevel="warning" />
+			</MetaCommand>
+			<MetaCommand name="ST19_Add_Definition" shortDescription="Create one event-action definition">
+				<BaseMetaCommand metaCommandRef="AcubeSATTC">
+					<ArgumentAssignmentList>
+						<ArgumentAssignment argumentName="ECSS_Service_Type" argumentValue="19" />
+						<ArgumentAssignment argumentName="ECSS_Message_Type" argumentValue="1" />
+					</ArgumentAssignmentList>
+				</BaseMetaCommand>
+				<ArgumentList>
+					<Argument argumentTypeRef="uint16_t" name="APID" initialValue="0" />
+					<Argument argumentTypeRef="uint16_t" name="Event_Definition_ID" />
+					<Argument argumentTypeRef="uint16_t" name="Event_Action_Definition_ID" />
+					<Argument argumentTypeRef="TC_Request_Type" name="TC" />
+				</ArgumentList>
+				<CommandContainer name="ST19_Add_Definition">
+					<EntryList>
+						<ArgumentRefEntry argumentRef="APID" />
+						<ArgumentRefEntry argumentRef="Event_Definition_ID" />
+						<ArgumentRefEntry argumentRef="Event_Action_Definition_ID" />
+						<ArgumentRefEntry argumentRef="TC" />
+					</EntryList>
+					<BaseContainer containerRef="AcubeSATTC" />
+				</CommandContainer>
+				<DefaultSignificance consequenceLevel="warning" />
+			</MetaCommand>
+			<MetaCommand name="ST19_Delete_Definition" shortDescription="Delete one event-action definition">
+				<BaseMetaCommand metaCommandRef="AcubeSATTC">
+					<ArgumentAssignmentList>
+						<ArgumentAssignment argumentName="ECSS_Service_Type" argumentValue="19" />
+						<ArgumentAssignment argumentName="ECSS_Message_Type" argumentValue="2" />
+					</ArgumentAssignmentList>
+				</BaseMetaCommand>
+				<ArgumentList>
+					<Argument argumentTypeRef="uint16_t" name="APID" initialValue="0" />
+					<Argument argumentTypeRef="uint16_t" name="Event_Definition_ID" />
+					<Argument argumentTypeRef="uint16_t" name="Event_Action_Definition_ID" />
+				</ArgumentList>
+				<CommandContainer name="ST19_Delete_Definition">
+					<EntryList>
+						<FixedValueEntry name="N" binaryValue="0001" sizeInBits="16" />
+						<ArgumentRefEntry argumentRef="APID" />
+						<ArgumentRefEntry argumentRef="Event_Definition_ID" />
+						<ArgumentRefEntry argumentRef="Event_Action_Definition_ID" />
 					</EntryList>
 					<BaseContainer containerRef="AcubeSATTC" />
 				</CommandContainer>
