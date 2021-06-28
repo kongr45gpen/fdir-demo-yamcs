@@ -791,6 +791,19 @@ if (messageType.value == 1) {
 				</CommandContainer>
 				<DefaultSignificance consequenceLevel="watch" />
 			</MetaCommand>
+			<MetaCommand name="Add_Bogus_Temperature" shortDescription="Start adding a fake value to the temperature sensors">
+				<BaseMetaCommand metaCommandRef="ST08_Function">
+					<ArgumentAssignmentList>
+						<ArgumentAssignment argumentName="ECSS_Function_Name" argumentValue="bogus_temp" />
+						<ArgumentAssignment argumentName="ECSS_Function_Data" argumentValue="0" />
+					</ArgumentAssignmentList>
+				</BaseMetaCommand>
+				<CommandContainer name="Add_Bogus_Temperature">
+					<EntryList />
+					<BaseContainer containerRef="ST08_Function" />
+				</CommandContainer>
+				<DefaultSignificance consequenceLevel="watch" />
+			</MetaCommand>
 			<MetaCommand name="OnBoardMonitoring_Enable" shortDescription="Enable the entire on-board monitoring function">
 				<BaseMetaCommand metaCommandRef="AcubeSATTC">
 					<ArgumentAssignmentList>
